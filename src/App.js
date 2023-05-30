@@ -1,24 +1,31 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect } from "react";
+import "./App.css";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import LoginPage from "./Component/LoginPage/LoginPage";
+import RegisterPage from "./Component/RegisterPage/RegisterPage";
+import { useSelector } from "react-redux";
+import HomePage from "./Component/HomePage/HomePage";
+import ModalMessage from "./Component/ModelMessage/ModelMessage";
 
 function App() {
+  const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
+  const isAuthenticated = localStorage.getItem("token") && infoUser.role !== 2;
+  console.log(infoUser.role);
+  console.log(isAuthenticated);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        {!isAuthenticated | true ? (
+          <Route path="/homePage" element={<HomePage />} />
+        ) : (
+          <Route path="/login" element={<LoginPage />} />
+        )}
+      </Routes>
+      <ModalMessage />
+    </BrowserRouter>
   );
 }
 
