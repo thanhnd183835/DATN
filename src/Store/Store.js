@@ -13,11 +13,14 @@ import {
   REHYDRATE,
 } from "redux-persist";
 import storage from "redux-persist/lib/storage";
-
+import postReducer from "../Redux/post/post.slice";
+import userReducer from "../Redux/user/user.slice";
 const rootReducer = combineReducers({
   auth: authReducer,
   // transaction: transactionReducer,
   message: messageReducer,
+  post: postReducer,
+  user: userReducer,
 });
 
 const persistConfig = {

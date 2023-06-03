@@ -213,6 +213,23 @@ const RegisterPage = () => {
                   </div>
                   <div className="fv-row mb-4 fv-plugins-icon-container">
                     <Controller
+                      name="userName"
+                      render={({ field }) => (
+                        <TextField
+                          {...field}
+                          id="userName"
+                          label="Tên Tài Khoản"
+                          variant="outlined"
+                          size="small"
+                          className="form-control bg-transparent"
+                          type="text"
+                        />
+                      )}
+                      control={control}
+                    />
+                  </div>
+                  <div className="fv-row mb-4 fv-plugins-icon-container">
+                    <Controller
                       name="lastName"
                       render={({ field }) => (
                         <TextField

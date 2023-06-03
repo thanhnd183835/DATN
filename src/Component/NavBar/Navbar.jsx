@@ -9,16 +9,21 @@ import Badge from "@mui/material/Badge";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
 import SearchIcon from "@mui/icons-material/Search";
-import AccountCircle from "@mui/icons-material/AccountCircle";
 import MailIcon from "@mui/icons-material/Mail";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import MoreIcon from "@mui/icons-material/MoreVert";
 import Avatar from "@mui/material/Avatar";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
+import LockIcon from "@mui/icons-material/Lock";
+import AddBoxIcon from "@mui/icons-material/AddBox";
+import Button from "@mui/material/Button";
+import { useNavigate } from "react-router-dom";
+import { logout } from "../../Redux/auth/auth.slice";
+import PersonIcon from "@mui/icons-material/Person";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
-  borderRadius: theme.shape.borderRadius,
+  borderRadius: "15px",
   backgroundColor: alpha(theme.palette.common.black, 0.15),
   "&:hover": {
     backgroundColor: alpha(theme.palette.common.black, 0.25),
@@ -40,6 +45,8 @@ const SearchIconWrapper = styled("div")(({ theme }) => ({
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
+  borderTopLeftRadius: "15px",
+  borderBottomLeftRadius: "15px",
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
@@ -59,10 +66,12 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const NavBar = () => {
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
-
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
   const isMenuOpen = Boolean(anchorEl);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -75,7 +84,18 @@ const NavBar = () => {
     setAnchorEl(null);
     handleMobileMenuClose();
   };
-
+  const handleGoToProfile = () => {
+    navigate("/profile");
+  };
+  const handleCreatePost = () => {
+    navigate("/createPost");
+  };
+  const handleLogOut = () => {
+    dispatch(logout());
+    localStorage.removeItem("persist:root");
+    localStorage.removeItem("token");
+    navigate("/login");
+  };
   const handleMobileMenuOpen = (event) => {
     setMobileMoreAnchorEl(event.currentTarget);
   };
@@ -85,20 +105,30 @@ const NavBar = () => {
     <Menu
       anchorEl={anchorEl}
       anchorOrigin={{
-        vertical: "top",
-        horizontal: "right",
+        vertical: "bottom",
+        horizontal: "left",
       }}
       id={menuId}
       keepMounted
       transformOrigin={{
         vertical: "top",
-        horizontal: "right",
+        horizontal: "left",
       }}
       open={isMenuOpen}
       onClose={handleMenuClose}
     >
-      <MenuItem onClick={handleMenuClose}>Profile</MenuItem>
-      <MenuItem onClick={handleMenuClose}>My account</MenuItem>
+      <MenuItem onClick={handleGoToProfile}>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <PersonIcon color="success" />
+        </IconButton>
+        <p className="mt-3">Thông tin tài khoản</p>
+      </MenuItem>
+      <MenuItem onClick={handleLogOut}>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <LockIcon color="error" />
+        </IconButton>
+        <p className="mt-3">Đăng xuất </p>
+      </MenuItem>
     </Menu>
   );
 
@@ -119,13 +149,19 @@ const NavBar = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
+      <MenuItem onClick={handleCreatePost}>
+        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
+          <AddBoxIcon color="warning" />
+        </IconButton>
+        <p className="mt-3">Thêm Sản Phẩm</p>
+      </MenuItem>
       <MenuItem>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
           <Badge badgeContent={4} color="error">
             <MailIcon color="primary" />
           </Badge>
         </IconButton>
-        <p>Messages</p>
+        <p className="mt-3">Tin Nhắn</p>
       </MenuItem>
       <MenuItem>
         <IconButton
@@ -137,9 +173,9 @@ const NavBar = () => {
             <NotificationsIcon color="success" />
           </Badge>
         </IconButton>
-        <p>Notifications</p>
+        <p className="mt-3">Thông Báo</p>
       </MenuItem>
-      <MenuItem onClick={handleProfileMenuOpen}>
+      <MenuItem onClick={handleGoToProfile}>
         <IconButton
           size="large"
           aria-label="account of current user"
@@ -149,34 +185,51 @@ const NavBar = () => {
         >
           <Avatar alt="anh dai dien" src={`${infoUser.avatar}`} />
         </IconButton>
-        <p>Profile</p>
+        <p className="mt-3">Thông tin tài khoản</p>
+      </MenuItem>
+      <MenuItem onClick={handleLogOut}>
+        <IconButton
+          size="large"
+          aria-label="account of current user"
+          aria-controls="primary-search-account-menu"
+          aria-haspopup="true"
+          color="inherit"
+        >
+          <LockIcon color="error" />
+        </IconButton>
+        <p className="mt-3">Đăng Xuất</p>
       </MenuItem>
     </Menu>
   );
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" className="" color="transparent">
+      <AppBar position="fixed" color="inherit" style={{ height: "6rem" }}>
         <Toolbar>
           <p
-            className="h2 me-5 ms-3 text-center"
+            className=" me-5 ms-3 text-center btn "
             style={{
               fontFamily: "Algerian",
               fontStyle: "italic",
               color: "red",
+              border: "none",
+            }}
+            onClick={() => {
+              navigate("/homePage");
             }}
           >
             <span
               style={{
                 color: "#5d85c7",
               }}
+              className="h2"
             >
               TH
             </span>
             <br />
-            <span className="text-center ms-3">market</span>
+            <span className="h2 text-center ms-3">market</span>
           </p>
-          <Search className="ms-xxl-5 ms-xl-5 ms-md-3 ms-sm-2 w-50 ">
+          <Search className="ms-xxl-5 ms-xl-5 ms-md-3 ms-sm-2 w-50">
             <SearchIconWrapper className="bg-warning">
               <SearchIcon />
             </SearchIconWrapper>
@@ -188,28 +241,42 @@ const NavBar = () => {
           </Search>
           <Box sx={{ flexGrow: 1 }} />
           <Box sx={{ display: { xs: "none", md: "flex" } }}>
+            <Button
+              className="mt-2 me-3 "
+              variant="contained"
+              style={{ height: "30px" }}
+              size="small"
+              startIcon={<AddBoxIcon />}
+              color="warning"
+              onClick={() => {
+                navigate("/createPost");
+              }}
+            >
+              Thêm Sản Phẩm
+            </Button>
             <IconButton
               size="large"
               aria-label="show 4 new mails"
               color="inherit"
-              className="me-xxl-5 me-lg-5 me-md-3 me-sm-2"
+              className="me-xxl-3 me-lg-3 me-md-2 me-sm-2"
             >
               <Badge badgeContent={4} color="error">
-                <MailIcon color="primary" />
+                <MailIcon color="primary" fontSize="medium" />
               </Badge>
             </IconButton>
             <IconButton
               size="large"
               aria-label="show 17 new notifications"
               color="inherit"
-              className="me-xxl-5 me-lg-5 me-md-3 me-sm-2"
+              className="me-xxl-3 me-lg-3 me-md-2 me-sm-2"
             >
               <Badge badgeContent={17} color="error">
-                <NotificationsIcon color="success" />
+                <NotificationsIcon color="success" fontSize="medium" />
               </Badge>
             </IconButton>
+
             <IconButton
-              size="large"
+              size="small"
               edge="end"
               aria-label="account of current user"
               aria-controls={menuId}
@@ -217,7 +284,14 @@ const NavBar = () => {
               onClick={handleProfileMenuOpen}
               color="inherit"
             >
-              <Avatar alt="anh dai dien" src={`${infoUser.avatar}`} />
+              <Avatar
+                alt="anh dai dien"
+                src={`${infoUser.avatar}`}
+                sx={{
+                  width: 40,
+                  height: 40,
+                }}
+              />
             </IconButton>
           </Box>
           <Box sx={{ display: { xs: "flex", md: "none" } }}>

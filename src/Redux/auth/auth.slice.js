@@ -3,14 +3,14 @@ import axiosInstance from "../../Sevices/config";
 
 export const signUP = createAsyncThunk("auth/sign-up", async (body) => {
   try {
-    return await axiosInstance.post(`users/auth/sign-up`, body);
+    return await axiosInstance.post(`api/auth/sign-up`, body);
   } catch (error) {
     throw error;
   }
 });
 export const signIn = createAsyncThunk("auth/sign-in", async (body) => {
   try {
-    return await axiosInstance.post(`users/auth/sign-in`, body);
+    return await axiosInstance.post(`api/auth/sign-in`, body);
   } catch (error) {
     throw error;
   }
@@ -20,7 +20,7 @@ export const signInFacebook = createAsyncThunk(
   "auth/facebook",
   async (access_token) => {
     try {
-      return await axiosInstance.post(`users/auth/facebook`, access_token);
+      return await axiosInstance.post(`api/auth/facebook`, access_token);
     } catch (error) {
       throw error;
     }
@@ -30,12 +30,27 @@ export const signInGoogle = createAsyncThunk(
   "auth/google",
   async (access_token) => {
     try {
-      return await axiosInstance.post(`users/auth/google`, access_token);
+      return await axiosInstance.post(`api/auth/google`, access_token);
     } catch (error) {
       throw error;
     }
   }
 );
+export const logout = createAsyncThunk("auth/logout", async (access_token) => {
+  try {
+    return await axiosInstance.post(`api/auth/logout`, access_token);
+  } catch (error) {
+    throw error;
+  }
+});
+export const getMe = createAsyncThunk("/users/get-me", async () => {
+  try {
+    return await axiosInstance.get(`/api/users/get-me`);
+  } catch (error) {
+    console.log(error);
+    return error;
+  }
+});
 
 const initialState = {
   loading: false,
@@ -85,6 +100,29 @@ const authSlice = createSlice({
     },
     //hoàn thành
     [`${signInGoogle.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    },
+    //logout
+    [`${logout.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${logout.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${logout.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    },
+    [`${getMe.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${getMe.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${getMe.fulfilled}`]: (state, action) => {
       state.loading = false;
       state.user = action.payload;
     },

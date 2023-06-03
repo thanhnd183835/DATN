@@ -68,7 +68,12 @@ const ModalMessage = () => {
             />
           )}
         </div>
-        <div>{msg}</div>
+        {type === "SUCCESS" ? (
+          <div style={{ color: "#0095f6" }}>{msg}</div>
+        ) : (
+          <div style={{ color: "red" }}>{msg}</div>
+        )}
+
         <Button
           height={"36px"}
           onClick={() => (onOk ? onOk() : dispatch(hideModalMessage()))}

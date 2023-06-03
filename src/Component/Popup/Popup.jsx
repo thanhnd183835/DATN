@@ -1,6 +1,5 @@
 import { makeStyles } from "@material-ui/core";
 import Modal from "@mui/material/Modal";
-import Backdrop from "@mui/material/Backdrop";
 import Fade from "@mui/material/Fade";
 import CloseIcon from "@mui/icons-material/Close";
 const Popup = ({

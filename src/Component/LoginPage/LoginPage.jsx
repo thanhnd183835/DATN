@@ -109,11 +109,11 @@ const LoginPage = () => {
               <br />
               <span className="text-center ms-3">market</span>
             </p>
-            <div className="text-gray-600 fs-base text-center fw-semibold">
+            {/* <div className="text-gray-600 fs-base text-center fw-semibold">
               <a href="#" className="opacity-75-hover text-primary me-1">
                 the blogger
               </a>
-            </div>
+            </div> */}
           </div>
         </div>
         <div className="d-flex flex-lg-row justify-content-lg-end p-5 w-100">
