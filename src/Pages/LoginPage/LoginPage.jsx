@@ -31,7 +31,7 @@ const LoginPage = () => {
     const res = await dispatch(signIn(body));
     if (res?.payload?.data?.code === 0) {
       await localStorage.setItem("token", res?.payload?.data?.token);
-      navigate("/homePage");
+      navigate("/");
     } else if (res.error.message === "Request failed with status code 404") {
       dispatch(
         showModalMessage({
@@ -49,7 +49,7 @@ const LoginPage = () => {
       })
     );
     if (res) {
-      navigate("/homePage");
+      navigate("/");
     }
   };
 

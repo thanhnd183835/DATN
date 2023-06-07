@@ -51,6 +51,16 @@ export const getMe = createAsyncThunk("/users/get-me", async () => {
     return error;
   }
 });
+export const replacePassword = createAsyncThunk(
+  "auth/replace-password",
+  async (body) => {
+    try {
+      return await axiosInstance.post(`/api/auth/replace-password`, body);
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 
 const initialState = {
   loading: false,

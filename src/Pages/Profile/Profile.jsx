@@ -1,12 +1,11 @@
 import * as React from "react";
 import "./Profile.css";
 import { useNavigate } from "react-router-dom";
-import NavBar from "../NavBar/Navbar";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { useState } from "react";
 import CameraAltIcon from "@mui/icons-material/CameraAlt";
-import Popup from "../Popup/Popup";
+import Popup from "../../Component/Popup/Popup";
 import Avatar from "react-avatar-edit";
 import axios from "axios";
 import { BASE_URL } from "../../Ultils/constant";
@@ -14,6 +13,18 @@ import { getMe } from "../../Redux/auth/auth.slice";
 import { showModalMessage } from "../../Redux/message/message.slice";
 import { getFollowers, getFollowing } from "../../Redux/user/user.slice";
 import { getPostMe } from "../../Redux/post/post.slice";
+import Card from "@mui/material/Card";
+import CardHeader from "@mui/material/CardHeader";
+import CardMedia from "@mui/material/CardMedia";
+import CardContent from "@mui/material/CardContent";
+import CardActions from "@mui/material/CardActions";
+import Typography from "@mui/material/Typography";
+import FavoriteIcon from "@mui/icons-material/Favorite";
+import IconButton from "@mui/material/IconButton";
+import Box from "@mui/material/Box";
+import Tabs from "@mui/material/Tabs";
+import Tab from "@mui/material/Tab";
+import NavBar from "../../Component/NavBar/Navbar";
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -38,6 +49,7 @@ const useStyles = makeStyles(() => ({
     },
   },
 }));
+
 const Profile = () => {
   const classes = useStyles();
   const navigate = useNavigate();
@@ -46,6 +58,7 @@ const Profile = () => {
   const [isShowFollowers, setIsShowFollowers] = useState(false);
   const [isShowFollowing, setIsShowFollowing] = useState(false);
   const [src, setSrc] = useState(null);
+  const [expanded, setExpanded] = React.useState(false);
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
@@ -55,7 +68,13 @@ const Profile = () => {
   const listFollowing = useSelector(
     (state) => state?.user?.following?.data?.data
   );
+
   const listPostForMe = useSelector((state) => state.post?.postOfMe?.data);
+  const [value, setValue] = React.useState(0);
+
+  const handleChange = (event, newValue) => {
+    setValue(newValue);
+  };
 
   const onClose = () => {
     setPreview(null);
@@ -66,58 +85,59 @@ const Profile = () => {
 
   const ShowPicture = (props) => {
     return (
-      <>
-        <div
-          className="profile_picture_container"
-          onClick={() => {
-            navigate({
-              pathname: `/post/${props.id}`,
-              state: {
-                postId: props.id,
-                liked: props.liked,
-                numberLikes: props.likes,
-                followed: listFollowing?.find((i) => i._id === props?.userId)
-                  ? true
-                  : false,
-              },
-            });
+      <Card
+        sx={{ maxWidth: 345 }}
+        className="border"
+        onClick={() => {
+          navigate(`/post/${props.id}`, {
+            state: {
+              postId: props.id,
+              liked: props.liked,
+              numberLikes: props.likes,
+            },
+          });
+        }}
+      >
+        <CardHeader
+          style={{
+            textAlign: "center",
+            color: "#083697",
           }}
-        >
-          <img
-            className="profile_picture"
-            style={{ width: "300px", height: "300px" }}
-            src={props.picture}
-            alt="san pham"
+        />
+        <div style={{ overflow: "hidden", maxHeight: "250px" }}>
+          <CardMedia
+            className="btn"
+            component="img"
+            image={props.picture}
+            alt="Paella dish"
           />
-
-          <div className="profile_icon_in_picture">
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                columnGap: "6px",
-              }}
-            >
-              {/* <FavoriteIcon style={{ color: "white" }} /> */}
-              <span style={{ color: "white", fontWeight: "bold" }}>
-                {props.likes}
-              </span>
-            </span>
-            <span
-              style={{
-                display: "flex",
-                alignItems: "center",
-                columnGap: "6px",
-              }}
-            >
-              {/* <ChatBubbleIcon style={{ color: "white" }} /> */}
-              <span style={{ color: "white", fontWeight: "bold" }}>
-                {props.comments}
-              </span>
-            </span>
-          </div>
         </div>
-      </>
+        <CardContent>
+          <Typography variant="body2" color="text.secondary">
+            <p className="text-uppercase f-3">
+              Giá:
+              <span
+                style={{
+                  color: "red",
+                  marginLeft: "3px",
+                  fontWeight: "600",
+                }}
+              >
+                {props.price}
+              </span>
+            </p>
+          </Typography>
+          <Typography>{props.name}</Typography>
+        </CardContent>
+        <CardActions disableSpacing>
+          <IconButton aria-label="add to favorites">
+            <FavoriteIcon color="error" />
+            <span className="fs-6 ms-1 fw-bolder">
+              Lượt thích {props.likes}
+            </span>
+          </IconButton>
+        </CardActions>
+      </Card>
     );
   };
   React.useEffect(() => {
@@ -172,14 +192,14 @@ const Profile = () => {
       <div>
         <NavBar />
       </div>
-      <div className={classes.profileContainer} style={{ paddingTop: "6rem" }}>
+      <div className={classes.profileContainer} style={{ paddingTop: "5rem" }}>
         <div className="profile-header">
           <div className="profile-avatar-box">
             <img
-              style={{ width: "100px", height: "100px", borderRadius: "50%" }}
+              style={{ width: "100px", height: "100px", borderRadius: "100%" }}
               className="profile-avatar"
               src={`${infoUser.avatar}`}
-              alt="anh dai dien"
+              alt="anh dai dien "
             />
             <div
               className="icon_picture"
@@ -188,7 +208,7 @@ const Profile = () => {
                 setPreview(null);
               }}
             >
-              <CameraAltIcon color="success" />
+              <CameraAltIcon />
             </div>
           </div>
           <div className="profile-info">
@@ -230,24 +250,25 @@ const Profile = () => {
             </div>
           </div>
         </div>
+        <div className="border">
+          <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
+            <Tabs value={value} onChange={handleChange} centered>
+              <Tab className="px-4 fw-bold" label="Hải Sản" />
+              <Tab className="px-4 fw-bold" label="Rau Củ" />
+              <Tab className="px-4 fw-bold" label="Hoa Quả" />
+              <Tab className="px-4 fw-bold" label="Bánh Kẹo" />
+              <Tab className="px-4 fw-bold" label="Đồ Gia Dụng" />
+              <Tab className="px-4 fw-bold" label="Đồ Điện Tử" />
+            </Tabs>
+          </Box>
+        </div>
         {listPostForMe && listPostForMe?.length > 0 ? (
           <div className="profile-body">
-            {/* <ShowPicture
-              likes={listPostForMe.map((item) => item.likes.length)}
-              comments={listPostForMe.map((item) => item.comments.length)}
-              picture={listPostForMe.map((item) => item.UrlImg)}
-              id={listPostForMe.map((item) => item._id)}
-              liked={
-                listPostForMe.map((item) =>
-                  item.likes.find((i) => i.userId === infoUser._id)
-                )
-                  ? true
-                  : false
-              }
-              userId={listPostForMe.map((item) => item?.postBy)}
-            /> */}
             {listPostForMe.map((item) => (
               <ShowPicture
+                type={item.typeItem}
+                price={item.price}
+                name={item.name}
                 likes={item.likes.length}
                 comments={item.comments.length}
                 picture={item.UrlImg}

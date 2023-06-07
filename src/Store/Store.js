@@ -15,12 +15,16 @@ import {
 import storage from "redux-persist/lib/storage";
 import postReducer from "../Redux/post/post.slice";
 import userReducer from "../Redux/user/user.slice";
+import notificationReducer from "../Redux/notification/notification.slice";
+import socketReducer from "../Redux/socket/socket.slice";
 const rootReducer = combineReducers({
   auth: authReducer,
   // transaction: transactionReducer,
   message: messageReducer,
   post: postReducer,
   user: userReducer,
+  notification: notificationReducer,
+  socket: socketReducer,
 });
 
 const persistConfig = {

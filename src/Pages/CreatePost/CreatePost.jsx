@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import NavBar from "../NavBar/Navbar";
+import NavBar from "../../Component/NavBar/Navbar";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Typography from "@mui/material/Typography";
@@ -103,7 +103,7 @@ const CreatePost = (props) => {
           console.log(response);
           if (response.status === 201) {
             alert("Thêm sản phẩm thành công!");
-            navigate("/homePage");
+            navigate("/");
             // dispatch(
             //   showModalMessage({
             //     type: "SUCCESS",

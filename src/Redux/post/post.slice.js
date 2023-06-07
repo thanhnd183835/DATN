@@ -8,7 +8,34 @@ export const getPostMe = createAsyncThunk("post/get-post-for-me", async () => {
     return error;
   }
 });
-
+export const reactApi = createAsyncThunk("post/like", async (params) => {
+  try {
+    return await axiosInstance.post(`/api/post/like/${params}`);
+  } catch (error) {
+    return error;
+  }
+});
+export const getListUserLiked = createAsyncThunk(
+  "post/get-users-liked",
+  async (postId) => {
+    try {
+      return await axiosInstance.get(`/api/post/get-users-liked/${postId}`);
+    } catch (error) {
+      return error;
+    }
+  }
+);
+export const commentApi = createAsyncThunk("post/comment", async (data) => {
+  try {
+    const { postId, userId, content } = await data;
+    return await axiosInstance.post(`/api/post/comment/${postId}`, {
+      userId,
+      content,
+    });
+  } catch (error) {
+    return error;
+  }
+});
 const initialState = {
   loading: false,
   error: "",

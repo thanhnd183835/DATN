@@ -68,7 +68,7 @@ const RegisterPage = () => {
   const handleRegister = async (body) => {
     const res = await dispatch(signUP(body));
     if (res?.payload?.data.code === 0) {
-      navigate("/homePage");
+      navigate("/");
     } else if (res.error.message === "Request failed with status code 400") {
       dispatch(
         showModalMessage({

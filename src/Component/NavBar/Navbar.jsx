@@ -24,9 +24,9 @@ import PersonIcon from "@mui/icons-material/Person";
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
   borderRadius: "15px",
-  backgroundColor: alpha(theme.palette.common.black, 0.15),
+  backgroundColor: "#fff",
   "&:hover": {
-    backgroundColor: alpha(theme.palette.common.black, 0.25),
+    backgroundColor: "#e9ecef",
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -204,7 +204,10 @@ const NavBar = () => {
 
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="fixed" color="inherit" style={{ height: "6rem" }}>
+      <AppBar
+        position="fixed"
+        style={{ height: "6rem", backgroundColor: "#ffba00" }}
+      >
         <Toolbar>
           <p
             className=" me-5 ms-3 text-center btn "
@@ -215,7 +218,7 @@ const NavBar = () => {
               border: "none",
             }}
             onClick={() => {
-              navigate("/homePage");
+              navigate("/");
             }}
           >
             <span
@@ -230,13 +233,14 @@ const NavBar = () => {
             <span className="h2 text-center ms-3">market</span>
           </p>
           <Search className="ms-xxl-5 ms-xl-5 ms-md-3 ms-sm-2 w-50">
-            <SearchIconWrapper className="bg-warning">
+            <SearchIconWrapper style={{ backgroundColor: "#fd7e14" }}>
               <SearchIcon />
             </SearchIconWrapper>
             <StyledInputBase
               className="ms-3"
               placeholder="Tìm kiếm…"
               inputProps={{ "aria-label": "search" }}
+              style={{ color: "#212529" }}
             />
           </Search>
           <Box sx={{ flexGrow: 1 }} />

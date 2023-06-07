@@ -15,6 +15,33 @@ export const getFollowing = createAsyncThunk("user/get-following", async () => {
     throw error;
   }
 });
+export const editProfile = createAsyncThunk(
+  "user/edit-profile",
+  async (body) => {
+    try {
+      return await axiosInstance.post(`/api/users/edit-profile`, body);
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+export const followApi = createAsyncThunk("user/follow", async (params) => {
+  try {
+    return await axiosInstance.post(`/api/users/follow/${params}`);
+  } catch (error) {
+    throw error;
+  }
+});
+export const unFollowApi = createAsyncThunk(
+  "user/un-follow",
+  async (params) => {
+    try {
+      return await axiosInstance.post(`/api/users/un-follow/${params}`);
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 const initialState = {
   loading: false,
   error: "",
@@ -50,6 +77,41 @@ const userSlice = createSlice({
       state.error = action.error;
     },
     [`${getFollowing.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.following = action.payload;
+    },
+    [`${editProfile.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${editProfile.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${editProfile.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.user = action.payload;
+    },
+    //follow user
+    [`${followApi.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${followApi.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${followApi.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.following = action.payload;
+    },
+    //unfollow user
+    [`${unFollowApi.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${unFollowApi.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${unFollowApi.fulfilled}`]: (state, action) => {
       state.loading = false;
       state.following = action.payload;
     },
