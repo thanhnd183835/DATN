@@ -103,3 +103,20 @@
     cursor: pointer;
     margin-left: 10px;
 }
+.button_add_comment {
+    border: 0;
+    color: #fff;
+    display: inline;
+    padding: 10px;
+    position: relative;
+    background: transparent;
+    border-top: 1px solid #dbdbdb;
+    font-weight: 600;
+    cursor: pointer;
+    width: 150px;
+}
+
+.button_add_comment:disabled {
+    cursor: auto;
+    opacity: 0.3;
+}

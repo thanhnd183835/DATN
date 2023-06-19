@@ -18,30 +18,33 @@ import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
 import { BASE_URL } from "../../Ultils/constant";
 import { showModalMessage } from "../../Redux/message/message.slice";
 import { useNavigate } from "react-router-dom";
+import Footer from "../../Component/Footer/Footer";
+import CircularProgress from "@mui/material/CircularProgress";
+import Chat from "../../Component/Chat/Chat";
 const TypeItem = [
   {
     label: "Hải Sản",
-    value: "hải Sản",
+    value: "HaiSan",
   },
   {
     label: "Rau Củ",
-    value: "Rau Củ",
+    value: "RauCu",
   },
   {
     label: "Hoa Quả",
-    value: "Hoa Quả",
+    value: "HoaQua",
   },
   {
     label: "Bánh Kẹo",
-    value: "Bánh Kẹo",
+    value: "BanhKeo",
   },
   {
     label: "Đồ Gia Dụng",
-    value: "Đồ Gia Dụng",
+    value: "DoGiaDung",
   },
   {
     label: "Đồ Điện Tử",
-    value: "Đồ Điện Tử",
+    value: "DoDienTu",
   },
 ];
 
@@ -53,6 +56,7 @@ const CreatePost = (props) => {
   const [urlImg, setUrlImg] = useState("");
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
   const { handleSubmit, control, setValue } = useForm({
     mode: "onSubmit",
     reValidateMode: "onBlur",
@@ -63,7 +67,7 @@ const CreatePost = (props) => {
   const handleImageChange = async (e) => {
     const selected = e.target.files[0];
     setUrlImg(selected);
-    console.log(selected);
+
     const reader = new FileReader();
     reader.onloadend = () => {
       const imagePreview = reader.result;
@@ -76,6 +80,7 @@ const CreatePost = (props) => {
   };
 
   const handleCreatePost = async (data) => {
+    setLoading(true);
     const body = {
       name: data.name,
       price: data.price,
@@ -100,16 +105,10 @@ const CreatePost = (props) => {
         data: formData,
       })
         .then((response) => {
-          console.log(response);
           if (response.status === 201) {
+            setLoading(false);
             alert("Thêm sản phẩm thành công!");
             navigate("/");
-            // dispatch(
-            //   showModalMessage({
-            //     type: "SUCCESS",
-            //     msg: "Thêm sản phẩm thành công!",
-            //   })
-            // );
           } else {
             dispatch(
               showModalMessage({
@@ -261,7 +260,7 @@ const CreatePost = (props) => {
                       >
                         {TypeItem.map((gender, index) => {
                           return (
-                            <MenuItem value={gender.value} key={gender.value}>
+                            <MenuItem value={gender.value} key={index}>
                               {gender.label}
                             </MenuItem>
                           );
@@ -311,18 +310,33 @@ const CreatePost = (props) => {
             </div>
             <div>
               <CardActions className="float-end w-25">
-                <button type="submit" className="btn btn-primary mt-3 ">
+                <button
+                  type="submit"
+                  className="btn btn-warning mt-3 py-1 px-2"
+                >
                   <span
-                    className="indicator-label"
-                    style={{ fontFamily: "Arial" }}
+                    className="indicator-label d-flex flex-row "
+                    style={{ fontFamily: "Arial", color: "#fff" }}
                   >
-                    Thêm Sản Phẩm
+                    {loading && (
+                      <span>
+                        <CircularProgress size={20} set />
+                      </span>
+                    )}
+
+                    <span className="ms-2"> Thêm Sản Phẩm</span>
                   </span>
                 </button>
               </CardActions>
             </div>
           </form>
         </Card>
+      </div>
+      <div style={{ position: "fixed", bottom: "200px" }}>
+        <Chat />
+      </div>
+      <div className="pt-5">
+        <Footer />
       </div>
     </div>
   );

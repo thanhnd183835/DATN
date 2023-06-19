@@ -12,12 +12,12 @@ import "bootstrap/dist/js/bootstrap.bundle.min";
 
 ReactDOM.render(
   <Provider store={store}>
-    <PersistGate persistor={persistor}>
-      <React.StrictMode>
-        <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+    <PersistGate loading={null} persistor={persistor}>
+      <GoogleOAuthProvider clientId={process.env.REACT_APP_GOOGLE_CLIENT_ID}>
+        <React.StrictMode>
           <App />
-        </GoogleOAuthProvider>
-      </React.StrictMode>
+        </React.StrictMode>
+      </GoogleOAuthProvider>
     </PersistGate>
   </Provider>,
   document.getElementById("root")

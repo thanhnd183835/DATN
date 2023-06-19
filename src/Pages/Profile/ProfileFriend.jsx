@@ -1,23 +1,24 @@
 import * as React from "react";
 import "./Profile.css";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { makeStyles } from "@material-ui/core/styles";
 import { useSelector, useDispatch } from "react-redux";
 import { useState, useEffect } from "react";
-import CameraAltIcon from "@mui/icons-material/CameraAlt";
 import Popup from "../../Component/Popup/Popup";
 import Avatar from "react-avatar-edit";
-import { Button } from "@mui/material";
 import axios from "axios";
 import { BASE_URL } from "../../Ultils/constant";
-import { getMe } from "../../Redux/auth/auth.slice";
-import { showModalMessage } from "../../Redux/message/message.slice";
-import { getFollowers, getFollowing } from "../../Redux/user/user.slice";
-import { deletePost, getPostMe } from "../../Redux/post/post.slice";
-import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
-import SettingsIcon from "@mui/icons-material/Settings";
+import {
+  getFollowers,
+  getFollowing,
+  getProfileFriend,
+} from "../../Redux/user/user.slice";
+import {
+  deletePost,
+  getPostFriend,
+  getPostMe,
+} from "../../Redux/post/post.slice";
 import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
 import CardActions from "@mui/material/CardActions";
@@ -29,8 +30,8 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import NavBar from "../../Component/NavBar/Navbar";
 import Footer from "../../Component/Footer/Footer";
-import DeleteIcon from "@mui/icons-material/Delete";
 import Chat from "../../Component/Chat/Chat";
+
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -56,7 +57,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const Profile = () => {
+const ProfileFriend = (props) => {
+  const params = useParams();
+
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -64,6 +67,9 @@ const Profile = () => {
   const [isShowFollowers, setIsShowFollowers] = useState(false);
   const [isShowFollowing, setIsShowFollowing] = useState(false);
   const [src, setSrc] = useState(null);
+  const infoFriend = useSelector(
+    (state) => state?.user?.profileFriend?.data?.data
+  );
   const [expanded, setExpanded] = React.useState(false);
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
@@ -76,7 +82,9 @@ const Profile = () => {
     (state) => state?.user?.following?.data?.data
   );
 
-  const listPostForMe = useSelector((state) => state.post?.postOfMe?.data);
+  const listPostForFriend = useSelector(
+    (state) => state.post?.postOfFriend?.data
+  );
   const [value, setValue] = React.useState("all");
   const [listPost, setListPost] = useState([]);
 
@@ -90,7 +98,7 @@ const Profile = () => {
       } else {
         axios({
           method: "get",
-          url: `${BASE_URL}/api/post/get-post-for-me/${newValue}`,
+          url: `${BASE_URL}/api/post/get-list-typeItem/${params.id}/${newValue}`,
           headers: {
             "Content-Type": "application/json",
             Authorization: "Bearer " + localStorage.getItem("token"),
@@ -104,32 +112,32 @@ const Profile = () => {
     };
     fetchData();
   };
-  const handleDeletePost = (id) => {
-    dispatch(deletePost(id));
-    fetchData();
-  };
-  const fetchData = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    } else {
-      axios({
-        method: "get",
-        url: `${BASE_URL}/api/post/get-post-for-me`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          setListPost(response.data.data);
-        }
-      });
-    }
-  };
+
   useEffect(() => {
+    dispatch(getProfileFriend(params.id));
+    dispatch(getPostFriend(params.id));
+    const fetchData = async () => {
+      const token = localStorage.getItem("token");
+      if (!token) {
+        navigate("/login");
+      } else {
+        axios({
+          method: "get",
+          url: `${BASE_URL}/api/post/get-list-typeItem/${params.id}/all`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            setListPost(response.data.data);
+          }
+        });
+      }
+    };
     fetchData();
   }, []);
+
   const onClose = () => {
     setPreview(null);
   };
@@ -140,17 +148,6 @@ const Profile = () => {
   const ShowPicture = (props) => {
     return (
       <Card sx={{ maxWidth: 345 }} className="border ms-auto me-auto pb-sm-0">
-        <CardHeader
-          className="py-0"
-          action={
-            <div className="d-flex flex-row text-danger">
-              <IconButton onClick={() => handleDeletePost(props.id)}>
-                <DeleteIcon color="error" />
-              </IconButton>
-            </div>
-          }
-        />
-
         <div style={{ overflow: "hidden", maxHeight: "250px" }}>
           <CardMedia
             className="btn"
@@ -201,52 +198,7 @@ const Profile = () => {
       </Card>
     );
   };
-  // React.useEffect(() => {
-  //   dispatch(getFollowers());
-  //   dispatch(getFollowing());
-  //   dispatch(getPostMe());
-  // }, []);
-  const handleChangeAvatar = () => {
-    const token = localStorage.getItem("token");
-    const formData = new FormData();
-    const infoImage = editorRef.state?.file;
-    formData.append("image", infoImage);
-    if (!token) {
-      navigate("/login");
-    } else {
-      axios({
-        method: "post",
-        url: `${BASE_URL}/api/users/change-avatar`,
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        data: formData,
-      })
-        .then((response) => {
-          if (response.status === 200) {
-            setIsChangeAvatar(false);
-            dispatch(getMe());
-            dispatch(
-              showModalMessage({
-                type: "SUCCESS",
-                msg: "Thay đổi anh đại diện thành công!",
-              })
-            );
-          }
-        })
-        .catch((err) => {
-          if (err.response.status === 500) {
-            dispatch(
-              showModalMessage({
-                type: "ERROR",
-                msg: "Thay đổi ảnh đại diện Thất bại!",
-              })
-            );
-          }
-        });
-    }
-  };
+
   return (
     <>
       <div>
@@ -266,71 +218,17 @@ const Profile = () => {
                   borderRadius: "100%",
                 }}
                 className="profile-avatar"
-                src={`${infoUser?.avatar}`}
+                src={`${infoFriend?.avatar}`}
                 alt="anh dai dien "
               />
-              <div
-                className="icon_picture"
-                onClick={() => {
-                  setIsChangeAvatar(true);
-                  setPreview(null);
-                }}
-              >
-                <CameraAltIcon color="warning" />
-              </div>
             </div>
             <div className="profile-info">
               <div className="profile-title">
-                <div className="profile-user-name">{infoUser?.userName}</div>
-                <Button
-                  className="mt-2 ms-2"
-                  variant="contained"
-                  onClick={() => {
-                    navigate({
-                      pathname: `/edit-profile`,
-                    });
-                  }}
-                  color="error"
-                  startIcon={<SettingsIcon />}
-                  size="small"
-                >
-                  Chỉnh sửa trang cá nhân
-                </Button>
-                {infoUser.role === 1 ? (
-                  <Button
-                    className="ms-2 mt-2 "
-                    onClick={() => {
-                      navigate({
-                        pathname: `/edit-profile`,
-                      });
-                    }}
-                    variant="contained"
-                    color="warning"
-                    startIcon={<ShoppingCartIcon />}
-                    size="small"
-                  >
-                    Quản Lý Đơn Hàng
-                  </Button>
-                ) : (
-                  <Button
-                    className="ms-2 mt-2 "
-                    onClick={() => {
-                      navigate({
-                        pathname: `/edit-profile`,
-                      });
-                    }}
-                    variant="contained"
-                    color="warning"
-                    startIcon={<ShoppingCartIcon />}
-                    size="small"
-                  >
-                    Đơn Mua
-                  </Button>
-                )}
+                <div className="profile-user-name">{infoFriend?.userName}</div>
               </div>
               <div className="profile-info-detail">
                 <div style={{ cursor: "pointer" }} className="profile-post">
-                  <b>{listPostForMe?.length}</b> bài viết
+                  <b>{listPostForFriend?.length}</b> bài viết
                 </div>
                 <div
                   onClick={() => {
@@ -353,6 +251,7 @@ const Profile = () => {
               </div>
             </div>
           </div>
+
           <div className="border">
             <Box sx={{ width: "100%", bgcolor: "background.paper" }}>
               <Tabs onChange={handleChange} centered value={value}>
@@ -409,7 +308,9 @@ const Profile = () => {
               </Tabs>
             </Box>
           </div>
-
+          {/* <div>
+            <Chat />
+          </div> */}
           {listPost && listPost?.length > 0 ? (
             <div className="profile-body">
               {listPost.map((item) => (
@@ -451,6 +352,7 @@ const Profile = () => {
         <div className="pt-5">
           <Footer />
         </div>
+
         <Popup
           isOpen={isChangeAvatar}
           handleClose={() => {
@@ -473,15 +375,10 @@ const Profile = () => {
             <img src={preview} className="mt-2" alt="Preview" />
           </div>
 
-          <button
-            onClick={handleChangeAvatar}
-            className="profile_btn_save ms-auto me-auto"
-          >
-            Lưu Lại
-          </button>
+          <button className="profile_btn_save ms-auto me-auto">Lưu Lại</button>
         </Popup>
       </div>
     </>
   );
 };
-export default Profile;
+export default ProfileFriend;

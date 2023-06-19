@@ -17,6 +17,7 @@ import postReducer from "../Redux/post/post.slice";
 import userReducer from "../Redux/user/user.slice";
 import notificationReducer from "../Redux/notification/notification.slice";
 import socketReducer from "../Redux/socket/socket.slice";
+import cartReducer from "../Redux/cart/cart.slice";
 const rootReducer = combineReducers({
   auth: authReducer,
   // transaction: transactionReducer,
@@ -25,12 +26,14 @@ const rootReducer = combineReducers({
   user: userReducer,
   notification: notificationReducer,
   socket: socketReducer,
+  cart: cartReducer,
 });
 
 const persistConfig = {
   key: "root",
   version: 1,
   storage: storage,
+  blacklist: ["age"],
   // blacklist: ['age'], //blacklisting a store attribute name, will not persist that store attribute.
 };
 
@@ -39,11 +42,13 @@ const persistedReducer = persistReducer(persistConfig, rootReducer);
 export const store = configureStore({
   reducer: persistedReducer,
   // middleware option needs to be provided for avoiding the error. ref: https://redux-toolkit.js.org/usage/usage-guide#use-with-redux-persist
-  middleware: getDefaultMiddleware({
-    serializableCheck: {
-      ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
-    },
-  }),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: {
+        ignoreActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
+      },
+      serializableCheck: false,
+    }),
 });
 
 export const persistor = persistStore(store);

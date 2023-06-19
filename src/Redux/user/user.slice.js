@@ -42,15 +42,19 @@ export const unFollowApi = createAsyncThunk(
     }
   }
 );
+export const getProfileFriend = createAsyncThunk(
+  "users/get-profile-friend",
+  async (id) => {
+    try {
+      return await axiosInstance.get(`/api/users/profile-friend/${id}`);
+    } catch (error) {
+      throw error;
+    }
+  }
+);
 const initialState = {
   loading: false,
   error: "",
-  user: { code: 0, data: {} },
-  userSuggest: { code: 0, data: {} },
-  followers: { code: 0, data: {} },
-  following: { code: 0, data: {} },
-  searchUser: { code: 0, data: {} },
-  profileFriend: { code: 0, data: {} },
 };
 const userSlice = createSlice({
   name: "user",
@@ -114,6 +118,18 @@ const userSlice = createSlice({
     [`${unFollowApi.fulfilled}`]: (state, action) => {
       state.loading = false;
       state.following = action.payload;
+    },
+    // get profile friends
+    [`${getProfileFriend.pending}`]: (state) => {
+      state.loading = true;
+    },
+    [`${getProfileFriend.rejected}`]: (state, action) => {
+      state.loading = false;
+      state.error = action.error;
+    },
+    [`${getProfileFriend.fulfilled}`]: (state, action) => {
+      state.loading = false;
+      state.profileFriend = action.payload;
     },
   },
 });

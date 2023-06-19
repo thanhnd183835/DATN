@@ -8,6 +8,8 @@ import { useNavigate } from "react-router-dom";
 import { validateEmail } from "../../../src/Ultils/functions";
 import { logout, replacePassword } from "../../Redux/auth/auth.slice";
 import { editProfile } from "../../Redux/user/user.slice";
+import Footer from "../../Component/Footer/Footer";
+import Chat from "../../Component/Chat/Chat";
 const EditProfile = () => {
   const dispatch = useDispatch();
   const infoUser = useSelector((state) => state.auth?.user?.data?.data);
@@ -136,7 +138,6 @@ const EditProfile = () => {
     setNewPasError({ err: false, msg: "" });
     setConfirmPassError({ err: false, msg: "" });
     const res = await dispatch(replacePassword(body));
-    console.log(res);
     if (res?.error?.message === "Request failed with status code 404") {
       setCurPassError({ err: true, msg: "Mật khẩu không đúng!" });
       return;
@@ -165,7 +166,10 @@ const EditProfile = () => {
   };
   return (
     <>
-      <div className="border" style={{ paddingTop: "1rem" }}>
+      <div>
+        <NavBar />
+      </div>
+      <div className="border" style={{ paddingTop: "6rem" }}>
         <div style={{ padding: "20px 0px" }}>
           <div className="edit_container">
             <div className="edit_option">
@@ -391,6 +395,12 @@ const EditProfile = () => {
             )}
           </div>
         </div>
+      </div>
+      <div style={{ position: "fixed", bottom: "200px" }}>
+        <Chat />
+      </div>
+      <div>
+        <Footer />
       </div>
     </>
   );
