@@ -17,21 +17,52 @@ import {
   updateQuantity,
 } from "../../Redux/cart/cart.slice";
 import { makeStyles } from "@material-ui/core/styles";
-import Chat from "../../Component/Chat/Chat";
+import ButtonChat from "../../Component/Chat/ButtonChat";
 import Radio from "@mui/material/Radio";
 import RadioGroup from "@mui/material/RadioGroup";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import FormControl from "@mui/material/FormControl";
 import FormLabel from "@mui/material/FormLabel";
+import { NumberForMatter } from "../../Ultils/functions";
+import { createOrder } from "../../Redux/order/order.slice";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
+import Modal from "@mui/material/Modal";
+import Fade from "@mui/material/Fade";
+import Backdrop from "@mui/material/Backdrop";
+import Box from "@mui/material/Box";
+import ErrorIcon from "@mui/icons-material/Error";
+import Typography from "@mui/material/Typography";
+
 const useStyles = makeStyles((theme) => ({
   input: {
     textAlign: "center",
   },
   label: {},
 }));
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 400,
+  bgcolor: "#0000006b",
+  boxShadow: 24,
+  border: "none",
+  p: 4,
+  color: "#fff",
+};
 const CartDetail = () => {
   const navigate = useNavigate();
   const [listCart, setListCart] = useState([]);
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [address, setAddress] = useState("");
+  const [openDialog, setOpenDialog] = useState(false);
+  const [openModel, setOpenModel] = useState(false);
   const dispatch = useDispatch();
   const classes = useStyles();
   const [value, setValue] = React.useState("live");
@@ -39,6 +70,7 @@ const CartDetail = () => {
   const handleChange = (event) => {
     setValue(event.target.value);
   };
+
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -57,6 +89,9 @@ const CartDetail = () => {
         }
       });
     }
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
 
   useEffect(() => {
@@ -127,6 +162,35 @@ const CartDetail = () => {
       </div>
     );
   };
+
+  const handleOrder = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    } else if (phoneNumber === "" || address === "") {
+      setOpenModel(true);
+      setTimeout(() => {
+        setOpenModel(false);
+      }, 1200);
+    } else {
+      setOpenDialog(true);
+    }
+  };
+
+  const handleOpenDialog = async () => {
+    const body = {
+      phoneNumber: phoneNumber,
+      address: address,
+      totalMoney: totalMoney > 300000 ? totalMoney : totalMoney + 15000,
+      order: listCart,
+    };
+    setOpenDialog(true);
+    const res = await dispatch(createOrder(body));
+    if (res.payload.status === 201) {
+      setOpenDialog(false);
+      navigate("/order-by");
+    }
+  };
   return (
     <>
       <div>
@@ -140,6 +204,7 @@ const CartDetail = () => {
                 <div className="d-flex ms-2 mt-2 mb-2" key={items._id}>
                   <div className="btn">
                     <img
+                      alt="image post"
                       src={items.UrlImage}
                       style={{ width: 60 }}
                       onClick={() =>
@@ -154,16 +219,16 @@ const CartDetail = () => {
                     />
                   </div>
                   <div
-                    style={{ fontSize: 15, width: 400 }}
+                    style={{ fontSize: 15, width: 350 }}
                     className="my-auto py-auto ms-3"
                   >
                     {items.name}
                   </div>
                   <div
                     className="my-auto ms-3 text-danger"
-                    style={{ width: 100 }}
+                    style={{ width: 150 }}
                   >
-                    {items.price}.đ
+                    {NumberForMatter(items.price)}.đ
                   </div>
                   <div className="my-auto ms-3">
                     <QuantitySelector
@@ -187,10 +252,13 @@ const CartDetail = () => {
             </div>
             <div className="col-4 mt-4 ">
               <div className="row fw-bold">
-                <p className="col-8 ">Tạm Tính giỏ hàng</p>
-                <p className="col-4 text-danger text-end ">{totalMoney}.đ</p>
+                <p className="col-7 ">Tạm Tính giỏ hàng</p>
+                <p className="col-5 text-danger text-end ">
+                  {NumberForMatter(totalMoney)}.đ
+                </p>
               </div>
               <TextField
+                name="discountCode"
                 id="discountCode"
                 variant="outlined"
                 size="small"
@@ -219,16 +287,49 @@ const CartDetail = () => {
                   Lưu ý: Miễn phí vận chuyển cho đơn hàng từ 300.000đ
                 </p>
               </div>
+              <TextField
+                name="discountCode"
+                id="discountCode"
+                variant="outlined"
+                size="small"
+                className="form-control bg-transparent mt-2"
+                type="text"
+                placeholder="Địa chỉ giao hàng"
+                InputProps={{
+                  classes: {
+                    input: classes.input,
+                    root: classes.label,
+                  },
+                }}
+                onChange={(e) => setAddress(e.target.value)}
+              />
+              <TextField
+                name="phoneNumber"
+                id="discountCode"
+                variant="outlined"
+                size="small"
+                className="form-control bg-transparent mt-2"
+                type="text"
+                placeholder="Số điện thoại người nhận"
+                InputProps={{
+                  classes: {
+                    input: classes.input,
+                    root: classes.label,
+                  },
+                }}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+              />
+
               <div className="row pt-3">
-                <p className="fw-bold col-8">Thành tiền</p>
+                <p className="fw-bold col-7">Thành tiền</p>
                 <>
                   {totalMoney > 300000 === true ? (
-                    <div className="col-4 fw-bold text-danger text-end">
-                      {totalMoney}.đ
+                    <div className="col-5 fw-bold text-danger text-end">
+                      {NumberForMatter(totalMoney)}.đ
                     </div>
                   ) : (
                     <div className="col-4 fw-bold text-danger text-end">
-                      {totalMoney + 15000}.đ
+                      {NumberForMatter(totalMoney + 15000)}.đ
                     </div>
                   )}
                 </>
@@ -272,7 +373,12 @@ const CartDetail = () => {
               </div>
               {value === "live" ? (
                 <div className="pt-5 mb-5">
-                  <Button variant="contained" color="warning" fullWidth>
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    fullWidth
+                    onClick={handleOrder}
+                  >
                     Đặt Hàng
                   </Button>
                 </div>
@@ -287,11 +393,75 @@ const CartDetail = () => {
           </div>
         </Card>
       </div>
-      <div style={{ position: "fixed", bottom: "200px" }}>
-        <Chat />
+      <div style={{ position: "fixed", bottom: "60px" }}>
+        <ButtonChat />
       </div>
       <div className="pt-5">
         <Footer />
+      </div>
+      <div>
+        <Dialog
+          open={openDialog}
+          onClose={handleCloseDialog}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+          maxWidth={"sm"}
+          fullWidth={true}
+        >
+          <DialogTitle id="alert-dialog-title" className="text-center">
+            <HelpOutlineIcon color="error" style={{ fontSize: 50 }} />
+          </DialogTitle>
+          <DialogContent>
+            <DialogContentText
+              id="alert-dialog-description"
+              className="text-uppercase fs-5 text-center"
+            >
+              Bạn có đồng ý đặt Hàng?
+            </DialogContentText>
+          </DialogContent>
+          <DialogActions className="justify-content-center">
+            <Button
+              variant="outlined"
+              color="error"
+              onClick={handleCloseDialog}
+            >
+              Hủy
+            </Button>
+            <Button
+              variant="outlined"
+              color="success"
+              onClick={handleOpenDialog}
+              autoFocus
+            >
+              Đồng ý
+            </Button>
+          </DialogActions>
+        </Dialog>
+      </div>
+      <div>
+        <Modal
+          open={openModel}
+          closeAfterTransition
+          slots={{ backdrop: Backdrop }}
+          slotProps={{
+            backdrop: {},
+          }}
+        >
+          <Fade in={openModel}>
+            <Box sx={style}>
+              <Typography id="title" className="text-center">
+                <ErrorIcon color="error" style={{ fontSize: "80px" }} />
+              </Typography>
+              <Typography
+                id="description"
+                className="text-center"
+                sx={{ mt: 2 }}
+              >
+                Địa chỉ và số điện thoại không được bỏ trống.
+              </Typography>
+            </Box>
+          </Fade>
+        </Modal>
       </div>
     </>
   );

@@ -9,7 +9,8 @@ import { validateEmail } from "../../../src/Ultils/functions";
 import { logout, replacePassword } from "../../Redux/auth/auth.slice";
 import { editProfile } from "../../Redux/user/user.slice";
 import Footer from "../../Component/Footer/Footer";
-import Chat from "../../Component/Chat/Chat";
+import ButtonChat from "../../Component/Chat/ButtonChat";
+
 const EditProfile = () => {
   const dispatch = useDispatch();
   const infoUser = useSelector((state) => state.auth?.user?.data?.data);
@@ -397,7 +398,7 @@ const EditProfile = () => {
         </div>
       </div>
       <div style={{ position: "fixed", bottom: "200px" }}>
-        <Chat />
+        <ButtonChat />
       </div>
       <div>
         <Footer />

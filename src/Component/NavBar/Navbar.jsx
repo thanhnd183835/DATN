@@ -25,6 +25,7 @@ import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
 import axios from "axios";
 import { BASE_URL } from "../../Ultils/constant";
 import { makeStyles } from "@material-ui/core/styles";
+import { NumberForMatter } from "../../Ultils/functions";
 
 const Search = styled("div")(({ theme }) => ({
   position: "relative",
@@ -90,14 +91,12 @@ const NavBar = () => {
   const isNotiOpen = Boolean(openNoti);
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [listCart, setListCart] = useState([]);
-  const [isHovered, setIsHovered] = useState(false);
-
+  const [listPost, setListPost] = useState([]);
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
   const handleOpenCart = (event) => {
     setOpenCart(event.currentTarget);
-    fetchData();
   };
   const handleOpenNoti = (event) => {
     setOpenNoti(event.currentTarget);
@@ -147,7 +146,7 @@ const NavBar = () => {
       }
     });
     socket?.on("getNoti", async (data) => {
-      if (infoUser?.userName === data?.userAddCart) {
+      if (data) {
         await fetchData();
       }
     });
@@ -192,6 +191,35 @@ const NavBar = () => {
       });
     }
   };
+
+  const handleChangeInput = (e) => {
+    if (e.target.value != "") {
+      const search = async () => {
+        const token = localStorage.getItem("token");
+        if (!token) {
+          navigate("/login");
+        } else {
+          axios({
+            method: "get",
+            url: `${BASE_URL}/api/search/elasticsearch`,
+            params: {
+              query: e.target.value,
+            },
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }).then((response) => {
+            if (response.status === 200) {
+              setListPost(response.data);
+            }
+          });
+        }
+      };
+      search();
+    }
+  };
+
   useEffect(() => {
     fetchNotification();
     fetchData();
@@ -273,11 +301,15 @@ const NavBar = () => {
           ?.map((item) => (
             <div key={item._id}>
               <MenuItem onClick={() => navigate("/cart-detail")}>
-                <div className="d-flex">
+                <div className="d-flex ">
                   <div>
-                    <img src={item.UrlImage} style={{ width: 60 }} />
+                    <img
+                      src={item.UrlImage}
+                      style={{ width: 60 }}
+                      alt="image"
+                    />
                   </div>
-                  <div>
+                  <div className="my-auto">
                     <p
                       style={{
                         fontSize: 15,
@@ -285,13 +317,17 @@ const NavBar = () => {
                         overflow: "hidden",
                         textOverflow: "ellipsis",
                         marginLeft: 10,
+                        marginTop: "auto",
+                        marginBottom: "auto",
                       }}
                     >
                       {item.name}
                     </p>
                   </div>
-                  <div>
-                    <p className="ms-2 text-danger">{item.price}</p>
+                  <div className="my-auto">
+                    <p className="ms-2 text-danger my-auto">
+                      {NumberForMatter(item.price)}.đ
+                    </p>
                   </div>
                 </div>
               </MenuItem>
@@ -418,7 +454,7 @@ const NavBar = () => {
       open={isMobileMenuOpen}
       onClose={handleMobileMenuClose}
     >
-      {infoUser.role === 1 && (
+      {infoUser?.role === 1 && (
         <MenuItem onClick={handleCreatePost}>
           <IconButton
             size="large"
@@ -486,7 +522,55 @@ const NavBar = () => {
       </MenuItem>
     </Menu>
   );
-
+  const renderMenuSearch = (
+    <Menu
+      PaperProps={{
+        elevation: 0,
+        sx: {
+          width: 360,
+          height: 450,
+          overflow: "scroll",
+          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
+          mt: 0,
+        },
+      }}
+    >
+      {listPost.length > 0 ? (
+        listPost.map((items) => (
+          <div>
+            <MenuItem>
+              <div>
+                <div>
+                  <img src={items.UrlImage} alt="image" style={{ width: 60 }} />
+                </div>
+                <div>
+                  <p
+                    style={{
+                      fontSize: 15,
+                      width: 320,
+                      overflow: "hidden",
+                      textOverflow: "ellipsis",
+                      marginLeft: 10,
+                      marginTop: "auto",
+                      marginBottom: "auto",
+                    }}
+                  >
+                    {items.name}
+                  </p>
+                </div>
+              </div>
+            </MenuItem>
+          </div>
+        ))
+      ) : (
+        <div>
+          <p style={{ textAlign: "center", fontWeight: "600" }}>
+            No notification
+          </p>
+        </div>
+      )}
+    </Menu>
+  );
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -505,6 +589,7 @@ const NavBar = () => {
               }}
               onClick={() => {
                 navigate("/");
+                window.location.reload();
               }}
             >
               <span
@@ -527,11 +612,12 @@ const NavBar = () => {
                 placeholder="Tìm kiếm…"
                 inputProps={{ "aria-label": "search" }}
                 style={{ color: "#212529" }}
+                onChange={handleChangeInput}
               />
             </Search>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
-              {infoUser.role === 1 && (
+              {infoUser?.role === 1 && (
                 <Button
                   className="mt-2 me-3 "
                   variant="contained"

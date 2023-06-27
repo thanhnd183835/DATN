@@ -10,7 +10,6 @@ import CreatePost from "./Pages/CreatePost/CreatePost";
 import Profile from "./Pages/Profile/Profile";
 import EditProfile from "./Pages/EditProfile/EditProfile";
 import PostDetail from "./Pages/PostDetail/PostDetail";
-import HomePageWithFilter from "./Pages/HomePageWithFilter/HomePageWithFilter";
 import CartDetail from "./Pages/CartDetail/CartDetail";
 import ProfileFriend from "./Pages/Profile/ProfileFriend";
 import io from "socket.io-client";
@@ -19,7 +18,9 @@ import { BASE_URL } from "./Ultils/constant";
 import { hideModalMessage } from "./Redux/message/message.slice";
 import { getMe } from "./Redux/auth/auth.slice";
 import { useEffect } from "react";
-import Chat from "./Component/Chat/Chat";
+
+import BuyOrder from "./Pages/Order/BuyOrder";
+import OrderOfSeller from "./Pages/Order/OrderOfSeller";
 
 const socket = io.connect(BASE_URL);
 function App(props) {
@@ -52,8 +53,9 @@ function App(props) {
               <Route path="/profile-friend/:id" element={<ProfileFriend />} />
               <Route path="/edit-profile" element={<EditProfile />} />
               <Route path="/post/:id" element={<PostDetail />} />
-              <Route path="/:typeItem" element={<HomePageWithFilter />} />
               <Route path="/cart-detail" element={<CartDetail />} />
+              <Route path="/order-by" element={<BuyOrder />} />
+              <Route path="/order" element={<OrderOfSeller />} />
             </>
           ) : (
             <Route path="/login" element={<LoginPage />} />

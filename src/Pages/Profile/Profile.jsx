@@ -30,7 +30,9 @@ import Tab from "@mui/material/Tab";
 import NavBar from "../../Component/NavBar/Navbar";
 import Footer from "../../Component/Footer/Footer";
 import DeleteIcon from "@mui/icons-material/Delete";
-import Chat from "../../Component/Chat/Chat";
+import ButtonChat from "../../Component/Chat/ButtonChat";
+import { NumberForMatter } from "../../Ultils/functions";
+
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -64,7 +66,6 @@ const Profile = () => {
   const [isShowFollowers, setIsShowFollowers] = useState(false);
   const [isShowFollowing, setIsShowFollowing] = useState(false);
   const [src, setSrc] = useState(null);
-  const [expanded, setExpanded] = React.useState(false);
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
 
@@ -179,7 +180,7 @@ const Profile = () => {
                   fontWeight: "600",
                 }}
               >
-                {props.price}
+                {NumberForMatter(props.price)}
               </span>
             </p>
           </Typography>
@@ -201,11 +202,7 @@ const Profile = () => {
       </Card>
     );
   };
-  // React.useEffect(() => {
-  //   dispatch(getFollowers());
-  //   dispatch(getFollowing());
-  //   dispatch(getPostMe());
-  // }, []);
+
   const handleChangeAvatar = () => {
     const token = localStorage.getItem("token");
     const formData = new FormData();
@@ -283,7 +280,7 @@ const Profile = () => {
               <div className="profile-title">
                 <div className="profile-user-name">{infoUser?.userName}</div>
                 <Button
-                  className="mt-2 ms-2"
+                  className="mt-2 ms-3"
                   variant="contained"
                   onClick={() => {
                     navigate({
@@ -293,21 +290,23 @@ const Profile = () => {
                   color="error"
                   startIcon={<SettingsIcon />}
                   size="small"
+                  style={{ height: 30 }}
                 >
                   Chỉnh sửa trang cá nhân
                 </Button>
-                {infoUser.role === 1 ? (
+                {infoUser?.role === 1 ? (
                   <Button
                     className="ms-2 mt-2 "
                     onClick={() => {
                       navigate({
-                        pathname: `/edit-profile`,
+                        pathname: `/order`,
                       });
                     }}
                     variant="contained"
                     color="warning"
                     startIcon={<ShoppingCartIcon />}
                     size="small"
+                    style={{ height: 30 }}
                   >
                     Quản Lý Đơn Hàng
                   </Button>
@@ -316,13 +315,14 @@ const Profile = () => {
                     className="ms-2 mt-2 "
                     onClick={() => {
                       navigate({
-                        pathname: `/edit-profile`,
+                        pathname: `/order-by`,
                       });
                     }}
                     variant="contained"
                     color="warning"
                     startIcon={<ShoppingCartIcon />}
                     size="small"
+                    style={{ height: 30 }}
                   >
                     Đơn Mua
                   </Button>
@@ -445,8 +445,8 @@ const Profile = () => {
             </div>
           )}
         </div>
-        <div style={{ position: "fixed", bottom: "150px" }}>
-          <Chat />
+        <div style={{ position: "fixed", bottom: "80px" }}>
+          <ButtonChat />
         </div>
         <div className="pt-5">
           <Footer />

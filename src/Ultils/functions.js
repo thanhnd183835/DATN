@@ -21,3 +21,20 @@ export const getTimePost = (date) => {
   if (minutes > 0) return minutes + " phút";
   return seconds + " giây";
 };
+export const NumberForMatter = (number) => {
+  const numberString = String(number);
+  const formattedNumber = [];
+
+  let count = 0;
+  for (let i = numberString.length - 1; i >= 0; i--) {
+    count++;
+    formattedNumber.unshift(numberString[i]);
+
+    if (count === 3 && i !== 0) {
+      count = 0;
+      formattedNumber.unshift(".");
+    }
+  }
+
+  return formattedNumber.join("");
+};

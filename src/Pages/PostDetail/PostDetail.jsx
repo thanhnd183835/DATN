@@ -39,7 +39,8 @@ import Box from "@mui/material/Box";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
 import { addCart } from "../../Redux/cart/cart.slice";
-import Chat from "../../Component/Chat/Chat";
+import ButtonChat from "../../Component/Chat/ButtonChat";
+import { NumberForMatter } from "../../Ultils/functions";
 
 const style = {
   position: "relative",
@@ -76,7 +77,6 @@ const PostDetail = () => {
   const [value, setValue] = useState(1);
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
 
-  register("my-locale", localeFunc);
   useEffect(() => {
     axios({
       method: "get",
@@ -167,6 +167,7 @@ const PostDetail = () => {
       setCommentChange(commentChange + 1);
     }
   };
+
   useEffect(() => {
     setActive(commentValue !== "");
   }, [commentValue]);
@@ -180,7 +181,11 @@ const PostDetail = () => {
       quantity: value,
       price: data.price,
       postId: data._id,
+      postBy: data.postBy,
+      statusCart: 0,
+      orderId: "",
     };
+
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
@@ -197,6 +202,7 @@ const PostDetail = () => {
           setOpen(false);
         }, 1000);
       }
+      socket?.emit("add_cart", body);
     }
   };
   return (
@@ -295,7 +301,7 @@ const PostDetail = () => {
                       <div className="mt-4 fs-6 text-primary">
                         Giá niêm yết:
                         <span className="ms-3 text-danger fw-bold">
-                          {post.price}đ.
+                          {NumberForMatter(post.price)}đ.
                         </span>
                       </div>
                       <div className="mt-4 fs-6 text-primary">
@@ -418,8 +424,8 @@ const PostDetail = () => {
               </Fade>
             </Modal>
           </div>
-          <div style={{ position: "fixed", bottom: "150px" }}>
-            <Chat />
+          <div style={{ position: "fixed", bottom: "60px" }}>
+            <ButtonChat />
           </div>
           <div className="pt-5">
             <Footer />

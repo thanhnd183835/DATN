@@ -30,8 +30,11 @@ import Tabs from "@mui/material/Tabs";
 import Tab from "@mui/material/Tab";
 import NavBar from "../../Component/NavBar/Navbar";
 import Footer from "../../Component/Footer/Footer";
-import Chat from "../../Component/Chat/Chat";
-
+import ButtonChat from "../../Component/Chat/ButtonChat";
+import { NumberForMatter } from "../../Ultils/functions";
+import { Button } from "@mui/material";
+import ChatIcon from "@mui/icons-material/Chat";
+import ModelChat from "../../Component/Chat/ModelChat";
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -59,7 +62,6 @@ const useStyles = makeStyles(() => ({
 
 const ProfileFriend = (props) => {
   const params = useParams();
-
   const classes = useStyles();
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -73,7 +75,7 @@ const ProfileFriend = (props) => {
   const [expanded, setExpanded] = React.useState(false);
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
-
+  const [isOpenModelChat, setIsOpenModelChat] = useState(false);
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
   const listFollower = useSelector(
     (state) => state?.user?.followers?.data?.data
@@ -176,7 +178,7 @@ const ProfileFriend = (props) => {
                   fontWeight: "600",
                 }}
               >
-                {props.price}
+                {NumberForMatter(props.price)}
               </span>
             </p>
           </Typography>
@@ -225,6 +227,19 @@ const ProfileFriend = (props) => {
             <div className="profile-info">
               <div className="profile-title">
                 <div className="profile-user-name">{infoFriend?.userName}</div>
+                <Button
+                  className="ms-2 mt-2 "
+                  onClick={() => {
+                    setIsOpenModelChat(true);
+                  }}
+                  variant="contained"
+                  color="warning"
+                  startIcon={<ChatIcon />}
+                  size="small"
+                  style={{ height: 30 }}
+                >
+                  Nhắn tin
+                </Button>
               </div>
               <div className="profile-info-detail">
                 <div style={{ cursor: "pointer" }} className="profile-post">
@@ -346,13 +361,16 @@ const ProfileFriend = (props) => {
             </div>
           )}
         </div>
-        <div style={{ position: "fixed", bottom: "150px" }}>
-          <Chat />
+        <div style={{ position: "fixed", bottom: "60px" }}>
+          <ButtonChat />
         </div>
         <div className="pt-5">
           <Footer />
         </div>
-
+        <ModelChat
+          open={isOpenModelChat}
+          close={() => setIsOpenModelChat(false)}
+        />
         <Popup
           isOpen={isChangeAvatar}
           handleClose={() => {

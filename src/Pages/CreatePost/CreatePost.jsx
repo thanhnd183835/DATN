@@ -20,7 +20,8 @@ import { showModalMessage } from "../../Redux/message/message.slice";
 import { useNavigate } from "react-router-dom";
 import Footer from "../../Component/Footer/Footer";
 import CircularProgress from "@mui/material/CircularProgress";
-import Chat from "../../Component/Chat/Chat";
+import ButtonChat from "../../Component/Chat/ButtonChat";
+
 const TypeItem = [
   {
     label: "Hải Sản",
@@ -333,7 +334,7 @@ const CreatePost = (props) => {
         </Card>
       </div>
       <div style={{ position: "fixed", bottom: "200px" }}>
-        <Chat />
+        <ButtonChat />
       </div>
       <div className="pt-5">
         <Footer />

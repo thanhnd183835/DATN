@@ -20,6 +20,7 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import CheckCircleIcon from "@mui/icons-material/CheckCircle";
 import ErrorIcon from "@mui/icons-material/Error";
+import { NumberForMatter } from "../../Ultils/functions";
 const useStyles = makeStyles({
   card: {
     borderRadius: "4px",
@@ -83,9 +84,11 @@ const ShowPicture = (props) => {
       quantity: 1,
       price: data.price,
       postId: data.id,
-      userAddCart: data.userName,
+      postBy: data.postBy,
+      statusCart: 0,
+      orderId: "",
     };
-
+    console.log(body);
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
@@ -163,7 +166,7 @@ const ShowPicture = (props) => {
                     fontWeight: "600",
                   }}
                 >
-                  {props.price}.đ
+                  {NumberForMatter(props.price)}.đ
                 </span>
               </p>
             </Typography>

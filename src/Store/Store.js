@@ -18,6 +18,8 @@ import userReducer from "../Redux/user/user.slice";
 import notificationReducer from "../Redux/notification/notification.slice";
 import socketReducer from "../Redux/socket/socket.slice";
 import cartReducer from "../Redux/cart/cart.slice";
+import chatReducer from "../Redux/chat/chat.slice";
+import orderReducer from "../Redux/order/order.slice";
 const rootReducer = combineReducers({
   auth: authReducer,
   // transaction: transactionReducer,
@@ -27,6 +29,8 @@ const rootReducer = combineReducers({
   notification: notificationReducer,
   socket: socketReducer,
   cart: cartReducer,
+  chat: chatReducer,
+  order: orderReducer,
 });
 
 const persistConfig = {
