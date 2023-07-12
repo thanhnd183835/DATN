@@ -124,7 +124,7 @@ const CreatePost = (props) => {
             dispatch(
               showModalMessage({
                 type: "ERROR",
-                msg: "Ảnh mô tả không được bỏ trống!",
+                msg: "lỗi không thể tạo bài đăng, bạn cần xem lại đã điền đầy đủ và đúng định dạng các trường chưa!",
               })
             );
           }
@@ -243,8 +243,11 @@ const CreatePost = (props) => {
                   )}
                   control={control}
                 />
+                <p className="text-danger font-italic" style={{ fontSize: 14 }}>
+                  Chú ý giá tiền nhập dạng số ví dụ 30.000 thì nhập 30000
+                </p>
               </div>
-              <div className="w-75 mt-4">
+              <div className="w-75 mt-3">
                 <Controller
                   name="typeItem"
                   render={({ field }) => (

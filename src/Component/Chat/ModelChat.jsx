@@ -30,7 +30,9 @@ const ModelChat = ({ open, close }) => {
     (state) => state.chat?.listMessage?.data?.data?.room
   );
   const infoUser = useSelector((state) => state.auth?.user?.data?.data);
-  const infoFriend = useSelector((state) => state.user.profileFriend.data.data);
+  const infoFriend = useSelector(
+    (state) => state.user.profileFriend?.data.data
+  );
   const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
   register("my-locale", localeFunc);
 
@@ -66,7 +68,6 @@ const ModelChat = ({ open, close }) => {
         );
       }
       dispatch(getListMessage(infoFriend._id));
-
       setInputText("");
     }
   };
@@ -78,8 +79,10 @@ const ModelChat = ({ open, close }) => {
     });
   }, [socket]);
   React.useEffect(() => {
-    dispatch(getProfileFriend(infoFriend?._id));
-    dispatch(getRooms());
+    const token = localStorage.getItem("token");
+    if (token) {
+      dispatch(getRooms());
+    }
   }, [infoFriend?._id]);
   return (
     <>
@@ -198,7 +201,7 @@ const ModelChat = ({ open, close }) => {
                             <br />
                             <span className="message-time px-0">
                               {moment(item.createdAt).format(
-                                "DD-MM-YYYY,hh:mm:ss"
+                                "DD-MM-YYYY,HH:mm:ss"
                               )}
                             </span>
                           </div>
@@ -210,7 +213,7 @@ const ModelChat = ({ open, close }) => {
                             <br />
                             <span className="message-time">
                               {moment(item.createdAt).format(
-                                "DD-MM-YYYY,hh:mm:ss"
+                                "DD-MM-YYYY,HH:mm:ss"
                               )}
                             </span>
                           </div>

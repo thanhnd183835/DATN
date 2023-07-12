@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import Card from "@mui/material/Card";
 import CardMedia from "@mui/material/CardMedia";
 import CardContent from "@mui/material/CardContent";
@@ -6,7 +6,7 @@ import FavoriteIcon from "@mui/icons-material/Favorite";
 import IconButton from "@mui/material/IconButton";
 import { Button, CardActions } from "@mui/material";
 import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import Typography from "@mui/material/Typography";
 import { reactApi } from "../../Redux/post/post.slice";
@@ -88,7 +88,7 @@ const ShowPicture = (props) => {
       statusCart: 0,
       orderId: "",
     };
-    console.log(body);
+
     const token = localStorage.getItem("token");
     if (!token) {
       navigate("/login");
@@ -113,7 +113,7 @@ const ShowPicture = (props) => {
       <div>
         <Card
           key={props._id}
-          sx={{ maxWidth: 200, maxHeight: 350 }}
+          sx={{ maxWidth: 200, maxHeight: 350, borderRadius: 3 }}
           className={classes.card}
         >
           <div
@@ -183,12 +183,12 @@ const ShowPicture = (props) => {
             )}
 
             <span style={{ fontSize: "12px", color: "#8e8ea0" }}>
-              Lượt thích {numberLikes}
+              {numberLikes} Lượt thích
             </span>
           </Typography>
           <CardActions>
             <Button
-              className="ms-2"
+              className="ms-auto me-auto"
               variant="contained"
               color="warning"
               startIcon={<LocalGroceryStoreIcon />}
@@ -197,7 +197,7 @@ const ShowPicture = (props) => {
                 addToCart(props);
               }}
             >
-              Thêm vào giỏ hàng
+              Thêm vào giỏ
             </Button>
             <div className="cart"></div>
           </CardActions>

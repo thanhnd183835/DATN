@@ -33,8 +33,6 @@ const EditProfile = () => {
     msg: "",
   });
 
-  // console.log(status);
-
   const handleUpdateProfile = async () => {
     if (fullName === "") {
       setFullNameError({ err: true, msg: "Vui lòng nhập tên!" });
@@ -62,7 +60,6 @@ const EditProfile = () => {
     };
 
     const res = await dispatch(editProfile(body));
-    // console.log('res: ', res);
     if (res?.payload?.status === 200) {
       dispatch(
         showModalMessage({

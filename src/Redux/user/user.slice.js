@@ -52,6 +52,35 @@ export const getProfileFriend = createAsyncThunk(
     }
   }
 );
+export const confirmSalePoint = createAsyncThunk(
+  "users/confirm-sale-point",
+  async (params) => {
+    try {
+      return await axiosInstance.post(
+        `/api/users/confirm-sale-point/${params}`
+      );
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+export const cancelSell = createAsyncThunk(
+  "users/cancel-sell",
+  async (params) => {
+    try {
+      return await axiosInstance.post(`/api/users/cancel-sell/${params}`);
+    } catch (error) {
+      throw error;
+    }
+  }
+);
+export const sendEmail = createAsyncThunk("users/send-email", async (body) => {
+  try {
+    return await axiosInstance.post(`/api/users/send-email`, body);
+  } catch (error) {
+    throw error;
+  }
+});
 const initialState = {
   loading: false,
   error: "",

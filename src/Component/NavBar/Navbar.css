@@ -1,0 +1,24 @@
+::-webkit-scrollbar {
+    width: 6px;
+    
+}
+
+::-webkit-scrollbar-track {
+    background-color: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background-color: #555555;
+}
+li:hover {
+    background-color: #e2e0e0;
+    cursor: pointer;
+}
+.register_sell{
+margin-left: 500px;
+}

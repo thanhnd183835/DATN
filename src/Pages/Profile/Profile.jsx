@@ -12,7 +12,12 @@ import axios from "axios";
 import { BASE_URL } from "../../Ultils/constant";
 import { getMe } from "../../Redux/auth/auth.slice";
 import { showModalMessage } from "../../Redux/message/message.slice";
-import { getFollowers, getFollowing } from "../../Redux/user/user.slice";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogContentText from "@mui/material/DialogContentText";
+import DialogTitle from "@mui/material/DialogTitle";
+import Dialog from "@mui/material/Dialog";
+import HelpOutlineIcon from "@mui/icons-material/HelpOutline";
 import { deletePost, getPostMe } from "../../Redux/post/post.slice";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import SettingsIcon from "@mui/icons-material/Settings";
@@ -68,6 +73,8 @@ const Profile = () => {
   const [src, setSrc] = useState(null);
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [idPost, setIdPost] = useState();
 
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
   const listFollower = useSelector(
@@ -106,8 +113,11 @@ const Profile = () => {
     fetchData();
   };
   const handleDeletePost = (id) => {
-    dispatch(deletePost(id));
-    fetchData();
+    setOpenDialog(true);
+    setIdPost(id);
+  };
+  const handleCloseDialog = () => {
+    setOpenDialog(false);
   };
   const fetchData = async () => {
     const token = localStorage.getItem("token");
@@ -128,6 +138,13 @@ const Profile = () => {
       });
     }
   };
+  const handleOpenDialog = async () => {
+    const res = dispatch(deletePost(idPost));
+    if (res.payload.status === 200) {
+      setOpenDialog(false);
+    }
+    fetchData();
+  };
   useEffect(() => {
     fetchData();
   }, []);
@@ -140,7 +157,10 @@ const Profile = () => {
 
   const ShowPicture = (props) => {
     return (
-      <Card sx={{ maxWidth: 345 }} className="border ms-auto me-auto pb-sm-0">
+      <Card
+        sx={{ maxWidth: 345, borderRadius: 3 }}
+        className="border ms-auto me-auto pb-sm-0"
+      >
         <CardHeader
           className="py-0"
           action={
@@ -195,7 +215,7 @@ const Profile = () => {
           <IconButton aria-label="add to favorites">
             <FavoriteIcon />
             <span className="fs-6 ms-1 fw-bolder">
-              Lượt thích {props.likes}
+              {props.likes} Lượt thích
             </span>
           </IconButton>
         </CardActions>
@@ -480,6 +500,45 @@ const Profile = () => {
             Lưu Lại
           </button>
         </Popup>
+        <div>
+          <Dialog
+            open={openDialog}
+            onClose={handleCloseDialog}
+            aria-labelledby="alert-dialog-title"
+            aria-describedby="alert-dialog-description"
+            maxWidth={"sm"}
+            fullWidth={true}
+          >
+            <DialogTitle id="alert-dialog-title" className="text-center">
+              <HelpOutlineIcon color="error" style={{ fontSize: 50 }} />
+            </DialogTitle>
+            <DialogContent>
+              <DialogContentText
+                id="alert-dialog-description"
+                className="text-uppercase fs-5 text-center"
+              >
+                Bạn có chắc chắn muốn xóa mặt hàng này?
+              </DialogContentText>
+            </DialogContent>
+            <DialogActions className="justify-content-center">
+              <Button
+                variant="outlined"
+                color="error"
+                onClick={handleCloseDialog}
+              >
+                Hủy
+              </Button>
+              <Button
+                variant="outlined"
+                color="success"
+                onClick={handleOpenDialog}
+                autoFocus
+              >
+                Đồng ý
+              </Button>
+            </DialogActions>
+          </Dialog>
+        </div>
       </div>
     </>
   );

@@ -193,7 +193,7 @@ const ProfileFriend = (props) => {
           <IconButton aria-label="add to favorites">
             <FavoriteIcon />
             <span className="fs-6 ms-1 fw-bolder">
-              Lượt thích {props.likes}
+              {props.likes} Lượt thích
             </span>
           </IconButton>
         </CardActions>

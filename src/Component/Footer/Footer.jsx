@@ -71,15 +71,28 @@ const Footer = () => {
                 Theo dõi chúng tôi trên
               </p>
               <ul className="list-unstyled d-flex gap-3">
-                <li key="facebook">
-                  <img
-                    src="https://res.cloudinary.com/dzjtdpc4h/image/upload/v1686125966/DATN/facebook_z8ahon.svg"
-                    width={32}
-                    height={32}
-                    alt={"facebook-icon"}
-                  />
+                <li
+                  key="facebook"
+                  className={"cursor-pointer"}
+                  style={{ borderRadius: 25 }}
+                >
+                  <a
+                    href="https://www.facebook.com/nguyenducthanh.98.BKA"
+                    target="_blank"
+                  >
+                    <img
+                      src="https://res.cloudinary.com/dzjtdpc4h/image/upload/v1686125966/DATN/facebook_z8ahon.svg"
+                      width={32}
+                      height={32}
+                      alt={"facebook-icon"}
+                    />
+                  </a>
                 </li>
-                <li className={"cursor-pointer"} key="youtube">
+                <li
+                  className={"cursor-pointer"}
+                  key="youtube"
+                  style={{ borderRadius: 20 }}
+                >
                   <img
                     src="https://res.cloudinary.com/dzjtdpc4h/image/upload/v1686125986/DATN/youtube_s6eh4r.svg"
                     width={32}
@@ -87,7 +100,11 @@ const Footer = () => {
                     alt={"youtube-icon"}
                   />
                 </li>
-                <li className={"cursor-pointer"} key="instagram">
+                <li
+                  className={"cursor-pointer"}
+                  key="instagram"
+                  style={{ borderRadius: 20 }}
+                >
                   <img
                     src="https://res.cloudinary.com/dzjtdpc4h/image/upload/v1686125985/DATN/instagram_xqjzf9.svg"
                     width={32}
@@ -95,7 +112,11 @@ const Footer = () => {
                     alt={"instagram-icon"}
                   />
                 </li>
-                <li className={"cursor-pointer"} key="twitter">
+                <li
+                  className={"cursor-pointer"}
+                  key="twitter"
+                  style={{ borderRadius: 20 }}
+                >
                   <img
                     src="https://res.cloudinary.com/dzjtdpc4h/image/upload/v1686125985/DATN/twitter_e7nzj0.svg"
                     width={32}

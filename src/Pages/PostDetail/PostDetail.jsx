@@ -41,7 +41,7 @@ import ErrorIcon from "@mui/icons-material/Error";
 import { addCart } from "../../Redux/cart/cart.slice";
 import ButtonChat from "../../Component/Chat/ButtonChat";
 import { NumberForMatter } from "../../Ultils/functions";
-
+import CommentIcon from "@mui/icons-material/Comment";
 const style = {
   position: "relative",
   top: "50%",
@@ -92,15 +92,7 @@ const PostDetail = () => {
       }
     });
   }, [commentChange]);
-  const goToProfile = (id) => {
-    if (infoUser._id === id) {
-      navigate("/profile");
-    } else {
-      navigate({
-        pathname: `/profile-friend/${id}`,
-      });
-    }
-  };
+
   const handleFollow = async () => {
     await dispatch(followApi(post?.postBy?._id));
     setFollowed(true);
@@ -231,7 +223,6 @@ const PostDetail = () => {
           <div>
             <NavBar />
           </div>
-
           <div className="row" style={{ paddingTop: "7rem" }}>
             <Card sx={{ maxWidth: 1200, margin: "auto" }} className="border">
               <div className="row pb-3">
@@ -257,7 +248,7 @@ const PostDetail = () => {
                       className="ms-1"
                       style={{ fontSize: "12px", color: "#8e8ea0" }}
                     >
-                      Lượt thích {post.likes.length}
+                      {post.likes.length} Lượt thích
                     </span>
                   </div>
                 </div>
@@ -368,6 +359,62 @@ const PostDetail = () => {
               </CardContent>
             </Card>
           </div>
+          <div className="pt-3">
+            <Card sx={{ maxWidth: 1200, margin: "auto" }} className="border">
+              <div className="pt-2 d-flex gap-2 ">
+                <input
+                  className="input_comment ms-5"
+                  placeholder="Bình luận..."
+                  onChange={(e) => {
+                    setCommentValue(e.target.value);
+                  }}
+                  value={commentValue}
+                />
+                <Button
+                  variant="contained"
+                  color="warning"
+                  className=" my-auto"
+                  startIcon={<CommentIcon />}
+                  onClick={handleAddComment}
+                  style={{ borderRadius: 20 }}
+                >
+                  Đăng
+                </Button>
+              </div>
+              <div className="box_comments">
+                <ul className="list-group mt-4" style={{ listStyle: "none" }}>
+                  {post.comments?.length > 0 &&
+                    post.comments.map((comment, index) => (
+                      <li className="d-flex  ms-3 mb-3 list_comments">
+                        <Avatar
+                          src={comment?.userId.avatar}
+                          className="my-auto border border-dark"
+                        />
+                        <span className="d-flex flex-column ms-3 list_comments_text">
+                          <span
+                            className="my-auto fw-bold"
+                            style={{
+                              fontStyle: "italic",
+                            }}
+                          >
+                            {comment?.userId.userName}
+                          </span>
+
+                          <span
+                            className="my-auto"
+                            style={{
+                              fontStyle: "italic",
+                            }}
+                          >
+                            {comment?.content}
+                          </span>
+                        </span>
+                      </li>
+                    ))}
+                </ul>
+              </div>
+            </Card>
+          </div>
           <div>
             <hr style={{ color: "red", borderWidth: "5px" }} />
           </div>
@@ -424,6 +471,7 @@ const PostDetail = () => {
               </Fade>
             </Modal>
           </div>
+
           <div style={{ position: "fixed", bottom: "60px" }}>
             <ButtonChat />
           </div>

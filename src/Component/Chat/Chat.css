@@ -20,7 +20,7 @@
     padding: 0;
     height: 45vh;
     overflow-y: scroll;
-    scrollbar-color: #888888 #f0f0f0;
+    scrollbar-color:  #f0f0f0;
 }
 .message-list::-webkit-scrollbar {
     width: 6px;
@@ -28,7 +28,7 @@
 }
 
 .message-list::-webkit-scrollbar-thumb {
-    background-color: #888888;
+    /* background-color: #888888; */
     border-radius: 4px;
 }
 
@@ -104,7 +104,7 @@
     justify-content: flex-end;
 }
 .message-content {
-    background-color: #F0F0F0;
+    background-color: #ffffff;
     padding: 8px;
     border-radius: 10px;
 
@@ -112,6 +112,14 @@
 .message-item.outgoing .message-content {
     background-color: #DCF8C6;
     color: #000;
+}
+.message-item.outgoing:hover {
+    background-color: #ffffff;
+    cursor: auto;
+}
+.message-item.incoming:hover {
+    background-color: #ffffff;
+    cursor: auto;
 }
 .message-item.incoming .message-content {
     background-color: #5fb5ee;

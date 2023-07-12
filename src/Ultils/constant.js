@@ -1,5 +1,5 @@
 export const BASE_URL = "http://localhost:2500";
-export const localeFunc = (number, trongdex, totalSec) => {
+export const localeFunc = (number, index, totalSec) => {
   return [
     ["bây giờ", "bây giờ"],
     ["%s giây trước", "trong %s giây"],
@@ -15,5 +15,5 @@ export const localeFunc = (number, trongdex, totalSec) => {
     ["%s tháng trước", "trong %s tháng"],
     ["1 năm trước", "trong 1 năm"],
     ["%s năm trước", "trong %s năm"],
-  ][trongdex];
+  ][index];
 };

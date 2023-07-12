@@ -39,7 +39,6 @@ const ModalMessage = () => {
   const dispatch = useDispatch();
   const { show, type, msg, onOk } = useSelector((state) => state.message.modal);
 
-  //   console.log(messageState);
   return (
     <Popup
       className={styles.modal}

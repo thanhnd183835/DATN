@@ -275,7 +275,7 @@ const RegisterPage = () => {
                     </div>
                     <div className="fv-row mb-4 fv-plugins-icon-container">
                       <Controller
-                        name="subDivision"
+                        name="subDiViSon"
                         render={({ field }) => (
                           <FormControl fullWidth className="pb-3">
                             <InputLabel id="demo-simple-select-label">

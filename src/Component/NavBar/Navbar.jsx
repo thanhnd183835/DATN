@@ -1,7 +1,8 @@
 import * as React from "react";
-import { styled, alpha } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 import AppBar from "@mui/material/AppBar";
-import { useState, useEffect } from "react";
+import "./Navbar.css";
+import { useState, useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import IconButton from "@mui/material/IconButton";
@@ -19,12 +20,12 @@ import LockIcon from "@mui/icons-material/Lock";
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import Button from "@mui/material/Button";
 import { useNavigate } from "react-router-dom";
-import { getMe, logout } from "../../Redux/auth/auth.slice";
+import { logout } from "../../Redux/auth/auth.slice";
 import PersonIcon from "@mui/icons-material/Person";
 import LocalGroceryStoreIcon from "@mui/icons-material/LocalGroceryStore";
 import axios from "axios";
 import { BASE_URL } from "../../Ultils/constant";
-import { makeStyles } from "@material-ui/core/styles";
+import Link from "@mui/material/Link";
 import { NumberForMatter } from "../../Ultils/functions";
 
 const Search = styled("div")(({ theme }) => ({
@@ -68,14 +69,8 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
     },
   },
 }));
-const useStyles = makeStyles((theme) => ({
-  root: {
-    whiteSpace: "unset",
-    wordBreak: "break-all",
-  },
-}));
+
 const NavBar = () => {
-  const classes = useStyles();
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
   const [anchorEl, setAnchorEl] = React.useState(null);
   const [mobileMoreAnchorEl, setMobileMoreAnchorEl] = React.useState(null);
@@ -92,6 +87,10 @@ const NavBar = () => {
   const isMobileMenuOpen = Boolean(mobileMoreAnchorEl);
   const [listCart, setListCart] = useState([]);
   const [listPost, setListPost] = useState([]);
+  const [openSearch, setOpenSearch] = useState(false);
+  const [errorSearch, setErrorSearch] = useState(false);
+  const wrapperRef = useRef(null);
+
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -139,6 +138,7 @@ const NavBar = () => {
   const showNumberCart = () => {
     return listCart.length;
   };
+
   useEffect(() => {
     socket?.on("getNoti", async (data) => {
       if (infoUser?.userName === data?.userNameCreatePost) {
@@ -158,18 +158,21 @@ const NavBar = () => {
     }
   }, [notifications]);
   const fetchNotification = async () => {
-    axios({
-      method: "get",
-      url: `${BASE_URL}/api/notification/get-all`,
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-    }).then((response) => {
-      if (response.status === 200) {
-        setNotifications(response.data.data);
-      }
-    });
+    const token = localStorage.getItem("token");
+    if (token) {
+      axios({
+        method: "get",
+        url: `${BASE_URL}/api/notification/get-all`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }).then((response) => {
+        if (response.status === 200) {
+          setNotifications(response.data.data);
+        }
+      });
+    }
   };
 
   const fetchData = async () => {
@@ -193,28 +196,26 @@ const NavBar = () => {
   };
 
   const handleChangeInput = (e) => {
-    if (e.target.value != "") {
+    setOpenSearch(true);
+    if (e.target.value !== "") {
       const search = async () => {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          navigate("/login");
-        } else {
-          axios({
-            method: "get",
-            url: `${BASE_URL}/api/search/elasticsearch`,
-            params: {
-              query: e.target.value,
-            },
-            headers: {
-              "Content-Type": "application/json",
-              Authorization: "Bearer " + localStorage.getItem("token"),
-            },
-          }).then((response) => {
-            if (response.status === 200) {
-              setListPost(response.data);
-            }
-          });
-        }
+        axios({
+          method: "get",
+          url: `${BASE_URL}/api/search/elasticsearch`,
+          params: {
+            query: e.target.value,
+          },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            setListPost(response.data);
+          } else {
+            setErrorSearch(true);
+          }
+        });
       };
       search();
     }
@@ -224,7 +225,20 @@ const NavBar = () => {
     fetchNotification();
     fetchData();
   }, []);
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        // Xử lý khi click chuột ra ngoài
+        setOpenSearch(false);
+      }
+    };
 
+    document.addEventListener("click", handleClickOutside);
+
+    return () => {
+      document.removeEventListener("click", handleClickOutside);
+    };
+  }, []);
   const menuId = "primary-search-account-menu";
   const cartId = "Cart ID";
   const notiId = "Notifications ID";
@@ -369,8 +383,8 @@ const NavBar = () => {
         elevation: 0,
         sx: {
           width: 360,
-          height: 450,
-          overflow: "scroll",
+          height: 400,
+          overflowY: "scroll",
           filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
           mt: 0,
         },
@@ -392,7 +406,7 @@ const NavBar = () => {
               sx={[{ "&:hover": { backgroundColor: "#dee2e6" } }]}
               className="px-1"
             >
-              <div className="d-flex align-items-center">
+              <div className="d-flex align-items-center ms-2">
                 <div>
                   <Avatar
                     src={item?.otherUser?.avatar}
@@ -401,23 +415,29 @@ const NavBar = () => {
                 </div>
 
                 <div
-                  className="d-flex align-items-center ms-2"
-                  style={{ height: 50 }}
+                  className="d-flex flex-row align-items-center ms-2"
+                  style={{
+                    height: 80,
+                  }}
                 >
                   <div>
                     <p
                       className="fw-bold mb-0"
-                      style={{ fontFamily: "revert-layer" }}
+                      style={{ fontFamily: "revert-layer", fontSize: 14 }}
                     >
                       {item?.otherUser?.userName}
                     </p>
                   </div>
-                  <div className="mt-1">
+                  <div>
                     <p
-                      classes={{ root: classes.root }}
+                      // classes={{ root: classes.root }}
                       style={{
+                        width: 150,
                         fontFamily: "revert-layer",
                         fontSize: 14,
+                        wordBreak: "break-word",
+                        wordBreak: "break-all",
+                        overflow: "hidden",
                       }}
                       className="mb-0 ms-2"
                     >
@@ -522,55 +542,7 @@ const NavBar = () => {
       </MenuItem>
     </Menu>
   );
-  const renderMenuSearch = (
-    <Menu
-      PaperProps={{
-        elevation: 0,
-        sx: {
-          width: 360,
-          height: 450,
-          overflow: "scroll",
-          filter: "drop-shadow(0px 2px 8px rgba(0,0,0,0.32))",
-          mt: 0,
-        },
-      }}
-    >
-      {listPost.length > 0 ? (
-        listPost.map((items) => (
-          <div>
-            <MenuItem>
-              <div>
-                <div>
-                  <img src={items.UrlImage} alt="image" style={{ width: 60 }} />
-                </div>
-                <div>
-                  <p
-                    style={{
-                      fontSize: 15,
-                      width: 320,
-                      overflow: "hidden",
-                      textOverflow: "ellipsis",
-                      marginLeft: 10,
-                      marginTop: "auto",
-                      marginBottom: "auto",
-                    }}
-                  >
-                    {items.name}
-                  </p>
-                </div>
-              </div>
-            </MenuItem>
-          </div>
-        ))
-      ) : (
-        <div>
-          <p style={{ textAlign: "center", fontWeight: "600" }}>
-            No notification
-          </p>
-        </div>
-      )}
-    </Menu>
-  );
+
   return (
     <>
       <Box sx={{ flexGrow: 1 }}>
@@ -578,9 +550,27 @@ const NavBar = () => {
           position="fixed"
           style={{ height: "6rem", backgroundColor: "#ffba00" }}
         >
-          <Toolbar>
+          {infoUser?.role === 0 && (
+            <Link
+              style={{
+                color: "#0434d1",
+                fontSize: 14,
+                marginLeft: 1000,
+              }}
+              className="register_sell"
+              underline="none"
+              component="button"
+              variant="body1"
+              onClick={() => {
+                navigate("/register-sell");
+              }}
+            >
+              Đăng ký bán hàng
+            </Link>
+          )}
+          <Toolbar style={{ marginLeft: "auto", marginRight: "auto" }}>
             <p
-              className=" me-5 ms-3 text-center btn "
+              className=" text-center btn "
               style={{
                 fontFamily: "Algerian",
                 fontStyle: "italic",
@@ -596,25 +586,88 @@ const NavBar = () => {
                 style={{
                   color: "#5d85c7",
                 }}
-                className="h2"
+                className="h2 ms-3"
               >
                 TH
               </span>
               <br />
               <span className="h2 text-center ms-3">market</span>
             </p>
-            <Search className="ms-xxl-5 ms-xl-5 ms-md-3 ms-sm-2 w-50">
-              <SearchIconWrapper style={{ backgroundColor: "#fd7e14" }}>
-                <SearchIcon />
-              </SearchIconWrapper>
-              <StyledInputBase
-                className="ms-3"
-                placeholder="Tìm kiếm…"
-                inputProps={{ "aria-label": "search" }}
-                style={{ color: "#212529" }}
-                onChange={handleChangeInput}
-              />
-            </Search>
+            <div className="relative">
+              <div>
+                <Search className="ms-xxl-5 ms-xl-5 ms-md-3 ms-sm-2 w-500">
+                  <SearchIconWrapper style={{ backgroundColor: "#fd7e14" }}>
+                    <SearchIcon />
+                  </SearchIconWrapper>
+                  <StyledInputBase
+                    autofocus
+                    className="ms-3"
+                    placeholder="Tìm kiếm…"
+                    inputProps={{ "aria-label": "search" }}
+                    style={{ color: "#212529" }}
+                    onChange={handleChangeInput}
+                  />
+                  {openSearch &&
+                    (errorSearch === false ? (
+                      <div
+                        className="position-absolute p-2 shadow-lg mt-2 rounded top-100 start-0 end-0"
+                        style={{
+                          overflowY: "scroll",
+                          height: "300px",
+                          backgroundColor: "#f8f9fa",
+                        }}
+                        ref={wrapperRef}
+                      >
+                        <ul style={{ color: "	#000000", listStyle: "none" }}>
+                          {listPost.length > 0 &&
+                            listPost.map((itemPost) => (
+                              <li
+                                className="d-flex mb-2 mt-2"
+                                onClick={() => {
+                                  navigate(`/post/${itemPost.postId}`, {
+                                    state: {
+                                      postId: itemPost.postId,
+                                      liked: itemPost.liked,
+                                      numberLikes: itemPost.likes,
+                                      userName: itemPost.userName,
+                                    },
+                                  });
+                                  window.location.reload();
+                                }}
+                              >
+                                <div>
+                                  <img
+                                    src={itemPost.UrlImg}
+                                    style={{ width: 60 }}
+                                    alt="image"
+                                  />
+                                </div>
+                                <div className="ms-3">
+                                  <p className="p-0 m-0">{itemPost.name}</p>
+                                  <p className="text-danger float-start">
+                                    {NumberForMatter(itemPost.price)}.đ
+                                  </p>
+                                </div>
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    ) : (
+                      <div
+                        className="position-absolute p-2 shadow-lg mt-2 rounded top-100 start-0 end-0"
+                        style={{
+                          overflowY: "scroll",
+                          height: "200px",
+                          backgroundColor: "#f8f9fa",
+                        }}
+                        ref={wrapperRef}
+                      >
+                        <p>Không có có sản phẩm nào </p>
+                      </div>
+                    ))}
+                </Search>
+              </div>
+            </div>
             <Box sx={{ flexGrow: 1 }} />
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               {infoUser?.role === 1 && (
@@ -641,16 +694,6 @@ const NavBar = () => {
               >
                 <Badge badgeContent={showNumberCart()} color="error">
                   <LocalGroceryStoreIcon color="primary" fontSize="medium" />
-                </Badge>
-              </IconButton>
-              <IconButton
-                size="large"
-                aria-label="show 4 new mails"
-                color="inherit"
-                className="me-xxl-3 me-lg-3 me-md-2 me-sm-2"
-              >
-                <Badge badgeContent={4} color="error">
-                  <MailIcon color="primary" fontSize="medium" />
                 </Badge>
               </IconButton>
               <IconButton
@@ -683,6 +726,7 @@ const NavBar = () => {
                 />
               </IconButton>
             </Box>
+
             <Box sx={{ display: { xs: "flex", md: "none" } }}>
               <IconButton
                 size="large"

@@ -37,6 +37,7 @@ import Backdrop from "@mui/material/Backdrop";
 import Box from "@mui/material/Box";
 import ErrorIcon from "@mui/icons-material/Error";
 import Typography from "@mui/material/Typography";
+import moment from "moment/moment";
 
 const useStyles = makeStyles((theme) => ({
   input: {
@@ -70,7 +71,7 @@ const CartDetail = () => {
   const handleChange = (event) => {
     setValue(event.target.value);
   };
-
+  const date = moment(new Date()).format("DD-MM-YYYY,HH:mm:ss");
   const fetchData = async () => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -176,7 +177,19 @@ const CartDetail = () => {
       setOpenDialog(true);
     }
   };
-
+  const handlePayment = () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      navigate("/login");
+    } else if (phoneNumber === "" || address === "") {
+      setOpenModel(true);
+      setTimeout(() => {
+        setOpenModel(false);
+      }, 1200);
+    } else {
+      setOpenDialog(true);
+    }
+  };
   const handleOpenDialog = async () => {
     const body = {
       phoneNumber: phoneNumber,
@@ -184,11 +197,41 @@ const CartDetail = () => {
       totalMoney: totalMoney > 300000 ? totalMoney : totalMoney + 15000,
       order: listCart,
     };
-    setOpenDialog(true);
-    const res = await dispatch(createOrder(body));
-    if (res.payload.status === 201) {
-      setOpenDialog(false);
-      navigate("/order-by");
+    if (value === "live") {
+      setOpenDialog(true);
+      const res = await dispatch(createOrder(body));
+      if (res.payload.status === 201) {
+        setOpenDialog(false);
+        console.log(res);
+        navigate("/order-by");
+      }
+    } else {
+      const res = await dispatch(createOrder(body));
+      if (res.payload.status === 201) {
+        setOpenDialog(false);
+        axios({
+          method: "POST",
+          url: `${BASE_URL}/api/transaction/create_payment_url`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          data: {
+            orderType: 250000,
+            bankCode: "NCB",
+            totalMoney: totalMoney > 300000 ? totalMoney : totalMoney + 15000,
+            orderInfo: "Thanh toan don hang luc:" + `${date}`,
+            orderId: res.payload.data.data._id,
+            language: "vn",
+          },
+        }).then((response) => {
+          // console.log(response);
+          if (response) {
+            // @ts-ignore1
+            window.open(response.data.data, "_blank");
+          }
+        });
+      }
     }
   };
   return (
@@ -204,7 +247,7 @@ const CartDetail = () => {
                 <div className="d-flex ms-2 mt-2 mb-2" key={items._id}>
                   <div className="btn">
                     <img
-                      alt="image post"
+                      alt="image_post"
                       src={items.UrlImage}
                       style={{ width: 60 }}
                       onClick={() =>
@@ -363,9 +406,9 @@ const CartDetail = () => {
                     </div>
                     <>
                       <FormControlLabel
-                        value="VNPAY"
+                        value="VNPAYQR"
                         control={<Radio />}
-                        label="VNPAY"
+                        label="VNPAY QR"
                       />
                     </>
                   </RadioGroup>
@@ -384,7 +427,12 @@ const CartDetail = () => {
                 </div>
               ) : (
                 <div className="pt-5 mb-5">
-                  <Button variant="contained" color="warning" fullWidth>
+                  <Button
+                    variant="contained"
+                    color="warning"
+                    fullWidth
+                    onClick={handlePayment}
+                  >
                     Thanh Toán
                   </Button>
                 </div>

@@ -5,7 +5,6 @@ export const getListMessage = createAsyncThunk(
   "chat/get-list-message",
   async (id) => {
     try {
-      // console.log('res: ', await axiosInstance.get(`/api/chat/get-list-message/${id}`));
       return await axiosInstance.get(`/api/chat/get-list-message/${id}`);
     } catch (error) {
       console.log(error);

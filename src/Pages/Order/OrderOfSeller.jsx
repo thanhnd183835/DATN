@@ -71,6 +71,11 @@ const OrderOfSeller = () => {
   useEffect(() => {
     fetchData();
   }, []);
+  const handlDetailOrder = (data) => {
+    navigate(`/order-detail/${data.orderId}`, {
+      state: data,
+    });
+  };
 
   return (
     <div>
@@ -79,73 +84,88 @@ const OrderOfSeller = () => {
       </div>
       <div style={{ paddingTop: "7rem" }}>
         <Card
-          sx={{ maxWidth: 1300, margin: "auto", minHeight: 500 }}
+          sx={{
+            maxWidth: 1300,
+            margin: "auto",
+            maxHeight: 600,
+            overflowY: "auto",
+          }}
           className="border"
         >
           {listOrder.length > 0 ? (
-            listOrder?.map((items) => (
-              <>
-                <div className="row ms-2 mt-2 mb-2 " key={items._id}>
-                  <div className="btn col-1">
-                    <img
-                      alt="image post"
-                      src={items.UrlImage}
-                      style={{ width: 60 }}
-                    />
-                  </div>
-
-                  <div
-                    style={{ fontSize: 15 }}
-                    className="my-auto py-auto col-3 fw-bold"
-                  >
-                    {items.name}
-                  </div>
-                  {items.price < 300000 ? (
-                    <div className="my-auto text-danger col-2">
-                      Giá: {NumberForMatter(items.price + 15000)}.đ
-                    </div>
-                  ) : (
-                    <div className="my-auto text-danger col-2">
-                      Giá: {NumberForMatter(items.price)}.đ
-                    </div>
-                  )}
-                  <div className="my-auto col-1">
-                    <span className="text-danger">số lượng:</span>
-                    {items.quantity}
-                  </div>
-                  <div className="my-auto col-2">
-                    <span className="text-danger">Ngày Đặt: </span>
-                    {moment(items.createdAt).format("DD/MM/YYYY, hh:mm:ss A")}
-                  </div>
-                  {items.statusCart === 0 ? (
-                    <div className="my-auto mx-auto text-danger col-1 px-0">
-                      <Chip
-                        label="Xác Nhận"
-                        color="error"
-                        variant="outlined"
-                        onClick={() => handleConFirm(items)}
+            listOrder
+              .slice()
+              .reverse()
+              ?.map((items) => (
+                <>
+                  <div className="row ms-2 mt-2 mb-2 " key={items._id}>
+                    <div className="col-1">
+                      <img
+                        alt="image post"
+                        src={items.UrlImage}
+                        style={{ width: 60 }}
                       />
                     </div>
-                  ) : items.statusCart === 2 ? (
-                    <div className="my-auto mx-auto text-danger col-1 px-0">
-                      <Chip label="Đã Từ chối" color="error" />
+
+                    <div
+                      style={{ fontSize: 15 }}
+                      className="my-auto py-auto col-3 fw-bold"
+                    >
+                      {items.name}
                     </div>
-                  ) : (
-                    <div className="my-auto mx-auto text-danger col-1 px-0">
-                      <Chip label="Đã Nhận" color="success" />
+                    {items.price < 300000 ? (
+                      <div className="my-auto text-danger col-2">
+                        Giá: {NumberForMatter(items.price + 15000)}.đ
+                      </div>
+                    ) : (
+                      <div className="my-auto text-danger col-2">
+                        Giá: {NumberForMatter(items.price)}.đ
+                      </div>
+                    )}
+                    <div className="my-auto col-1">
+                      <span className="text-danger">số lượng:</span>
+                      {items.quantity}
                     </div>
-                  )}
-                  <div className="my-auto mx-auto text-danger col-1 px-0">
-                    <Chip
-                      variant="outlined"
-                      color="error"
-                      onClick={() => handleRefuse(items)}
-                      label="Từ Chối"
-                    />
+                    <div className="my-auto col-2">
+                      <span className="text-danger">Ngày Đặt: </span>
+                      {moment(items.createdAt).format("DD/MM/YYYY, HH:mm:ss ")}
+                    </div>
+                    {items.statusCart === 0 ? (
+                      <div className="my-auto mx-auto text-danger col-1 px-0">
+                        <Chip
+                          label="Xác Nhận"
+                          color="primary"
+                          variant="outlined"
+                          onClick={() => handleConFirm(items)}
+                        />
+                      </div>
+                    ) : items.statusCart === 2 ? (
+                      <div className="my-auto mx-auto text-danger col-1 px-0">
+                        <Chip label="Đã Từ chối" color="error" />
+                      </div>
+                    ) : (
+                      <div className="my-auto mx-auto text-danger col-1 px-0">
+                        <Chip label="Đã Nhận" color="success" />
+                      </div>
+                    )}
+                    <div className="my-auto mx-auto text-danger col-1 px-0">
+                      <Chip
+                        variant="outlined"
+                        color="error"
+                        onClick={() => handleRefuse(items)}
+                        label="Từ Chối"
+                      />
+                    </div>
+                    <div className="my-auto mx-auto text-danger col-1 px-0">
+                      <Chip
+                        color="primary"
+                        onClick={() => handlDetailOrder(items)}
+                        label="Xem Chi tiết"
+                      />
+                    </div>
                   </div>
-                </div>
-              </>
-            ))
+                </>
+              ))
           ) : (
             <div className="text-center pt-4 fs-4">
               <p>Chưa có đơn hàng nào!</p>
@@ -153,7 +173,7 @@ const OrderOfSeller = () => {
           )}
         </Card>
       </div>
-      <div style={{ position: "fixed", bottom: "60px" }}>
+      <div style={{ position: "fixed", bottom: "150px" }}>
         <ButtonChat />
       </div>
       <div className="pt-4">
