@@ -124,7 +124,6 @@ const NavBar = () => {
     dispatch(logout());
     localStorage.removeItem("persist:root");
     localStorage.removeItem("token");
-
     navigate("/login");
   };
   const handleMobileMenuOpen = (event) => {
@@ -158,41 +157,33 @@ const NavBar = () => {
     }
   }, [notifications]);
   const fetchNotification = async () => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      axios({
-        method: "get",
-        url: `${BASE_URL}/api/notification/get-all`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          setNotifications(response.data.data);
-        }
-      });
-    }
+    axios({
+      method: "get",
+      url: `${BASE_URL}/api/notification/get-all`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    }).then((response) => {
+      if (response.status === 200) {
+        setNotifications(response?.data?.data);
+      }
+    });
   };
 
   const fetchData = async () => {
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    } else {
-      axios({
-        method: "get",
-        url: `${BASE_URL}/api/cart/get-list-cart`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          setListCart(response.data.data);
-        }
-      });
-    }
+    axios({
+      method: "get",
+      url: `${BASE_URL}/api/cart/get-list-cart`,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+    }).then((response) => {
+      if (response.status === 200) {
+        setListCart(response?.data?.data);
+      }
+    });
   };
 
   const handleChangeInput = (e) => {
@@ -340,7 +331,7 @@ const NavBar = () => {
                   </div>
                   <div className="my-auto">
                     <p className="ms-2 text-danger my-auto">
-                      {NumberForMatter(item.price)}.đ
+                      {NumberForMatter(item?.price)}.đ
                     </p>
                   </div>
                 </div>
@@ -398,8 +389,8 @@ const NavBar = () => {
                 navigate(`post/${item?.post?._id}`, {
                   state: {
                     postId: item?.post?._id,
-                    liked: item.liked,
-                    numberLikes: item.likes,
+                    liked: item?.liked,
+                    numberLikes: item?.likes,
                   },
                 })
               }
@@ -607,8 +598,8 @@ const NavBar = () => {
                     style={{ color: "#212529" }}
                     onChange={handleChangeInput}
                   />
-                  {openSearch &&
-                    (errorSearch === false ? (
+                  {openSearch === true &&
+                    (listPost.length > 0 ? (
                       <div
                         className="position-absolute p-2 shadow-lg mt-2 rounded top-100 start-0 end-0"
                         style={{
@@ -624,29 +615,49 @@ const NavBar = () => {
                               <li
                                 className="d-flex mb-2 mt-2"
                                 onClick={() => {
-                                  navigate(`/post/${itemPost.postId}`, {
-                                    state: {
-                                      postId: itemPost.postId,
-                                      liked: itemPost.liked,
-                                      numberLikes: itemPost.likes,
-                                      userName: itemPost.userName,
-                                    },
-                                  });
+                                  itemPost.postId
+                                    ? navigate(`/post/${itemPost.postId}`, {
+                                        state: {
+                                          postId: itemPost?.postId,
+                                          liked: itemPost?.liked,
+                                          numberLikes: itemPost?.likes,
+                                          userName: itemPost?.userName,
+                                        },
+                                      })
+                                    : navigate(
+                                        `/profile-friend/${itemPost.userId}`
+                                      );
                                   window.location.reload();
                                 }}
                               >
                                 <div>
-                                  <img
-                                    src={itemPost.UrlImg}
-                                    style={{ width: 60 }}
-                                    alt="image"
-                                  />
+                                  {itemPost.userName ? (
+                                    <Avatar
+                                      className="mt-1"
+                                      src={itemPost.avatar}
+                                      style={{ width: 40, height: 40 }}
+                                    />
+                                  ) : (
+                                    <img
+                                      src={itemPost.UrlImg}
+                                      style={{ width: 60 }}
+                                      alt="image"
+                                    />
+                                  )}
                                 </div>
                                 <div className="ms-3">
-                                  <p className="p-0 m-0">{itemPost.name}</p>
-                                  <p className="text-danger float-start">
-                                    {NumberForMatter(itemPost.price)}.đ
-                                  </p>
+                                  {itemPost.userName ? (
+                                    <p className="mt-2 text-primary">
+                                      {itemPost.userName}
+                                    </p>
+                                  ) : (
+                                    <>
+                                      <p className="p-0 m-0">{itemPost.name}</p>
+                                      <p className="text-danger float-start">
+                                        {NumberForMatter(itemPost.price)}.đ
+                                      </p>
+                                    </>
+                                  )}
                                 </div>
                               </li>
                             ))}
@@ -662,17 +673,19 @@ const NavBar = () => {
                         }}
                         ref={wrapperRef}
                       >
-                        <p>Không có có sản phẩm nào </p>
+                        <p className="text-danger text-center fs-5">
+                          Không có sản phẩm nào được tìm thấy
+                        </p>
                       </div>
                     ))}
                 </Search>
               </div>
             </div>
-            <Box sx={{ flexGrow: 1 }} />
+            {/* <Box sx={{ flexGrow: 1 }} /> */}
             <Box sx={{ display: { xs: "none", md: "flex" } }}>
               {infoUser?.role === 1 && (
                 <Button
-                  className="mt-2 me-3 "
+                  className=" me-3 my-auto mx-auto"
                   variant="contained"
                   style={{ height: "30px" }}
                   size="small"
@@ -689,7 +702,7 @@ const NavBar = () => {
                 size="large"
                 aria-label="show 4 new mails"
                 color="inherit"
-                className="me-xxl-3 me-lg-3 me-md-2 me-sm-2"
+                className="me-xxl-3 me-lg-3 me-md-2 me-sm-2 my-auto mx-auto"
                 onClick={handleOpenCart}
               >
                 <Badge badgeContent={showNumberCart()} color="error">
@@ -700,7 +713,7 @@ const NavBar = () => {
                 size="large"
                 aria-label="show  new notifications"
                 color="inherit"
-                className="me-xxl-3 me-lg-3 me-md-2 me-sm-2"
+                className="me-xxl-3 me-lg-3 me-md-2 me-sm-2 my-auto mx-auto"
                 onClick={handleOpenNoti}
               >
                 <Badge badgeContent={showNumberNotification()} color="error">
@@ -717,11 +730,13 @@ const NavBar = () => {
                 color="inherit"
               >
                 <Avatar
+                  className="my-auto mx-auto"
                   alt="anh dai dien"
                   src={`${infoUser?.avatar}`}
                   sx={{
                     width: 40,
                     height: 40,
+                    marginBottom: 2,
                   }}
                 />
               </IconButton>

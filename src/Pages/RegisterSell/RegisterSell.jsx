@@ -45,7 +45,6 @@ const RegisterSell = () => {
   });
   const handleRegisterSell = (data) => {
     const res = dispatch(sendEmail(data));
-    console.log(res);
     if (res) {
       setOpen(true);
       setTimeout(() => {
@@ -110,13 +109,16 @@ const RegisterSell = () => {
               <CardActions className="float-end w-25">
                 <button
                   type="submit"
-                  className="btn btn-primary mt-3 py-1 px-2 ms-5"
+                  className="btn mt-3 py-1 px-2 ms-5"
+                  style={{ backgroundColor: "#fd7e14" }}
                 >
                   <span
                     className="indicator-label d-flex flex-row "
                     style={{ fontFamily: "Arial", color: "#fff" }}
                   >
-                    <span className=" text-uppercase">Gửi đơn đăng ký</span>
+                    <span className=" text-uppercase" style={{ fontSize: 14 }}>
+                      Gửi đơn đăng ký
+                    </span>
                   </span>
                 </button>
               </CardActions>

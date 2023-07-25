@@ -79,7 +79,7 @@ const CreatePost = (props) => {
       reader.readAsDataURL(selected);
     }
   };
-
+ 
   const handleCreatePost = async (data) => {
     setLoading(true);
     const body = {

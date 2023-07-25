@@ -16,15 +16,18 @@ import { getProfileFriend } from "../../Redux/user/user.slice";
 import { showModalMessage } from "../../Redux/message/message.slice";
 import { format, register } from "timeago.js";
 import moment from "moment/moment";
-import { localeFunc } from "../../Ultils/constant";
+import { BASE_URL, localeFunc } from "../../Ultils/constant";
+import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
+import SendIcon from "@mui/icons-material/Send";
+import axios from "axios";
 
 const ModelChat = ({ open, close }) => {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
   const [inputText, setInputText] = React.useState("");
   const [openChat, setOpenChat] = React.useState(true);
   const [active, setActive] = React.useState(0);
-
+  const [urlImg, setUrlImg] = React.useState("");
+  const [previewImage, setPreviewImage] = React.useState("");
   const socket = useSelector((state) => state.socket.socket.payload);
   const listMessage = useSelector(
     (state) => state.chat?.listMessage?.data?.data?.room
@@ -35,31 +38,94 @@ const ModelChat = ({ open, close }) => {
   );
   const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
   register("my-locale", localeFunc);
+  const handleImageChange = async (e) => {
+    const selected = e.target.files[0];
+    setUrlImg(selected);
 
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const imagePreview = reader.result;
+
+      setPreviewImage(imagePreview);
+    };
+    if (selected && selected.type.match("image.*")) {
+      reader.readAsDataURL(selected);
+    }
+  };
   const handleChangeInput = (e) => {
     setInputText(e.target.value);
   };
+
   const keyPress = async (e) => {
     if (inputText === "" || inputText.trim() === "") {
       return;
     }
 
     if (e.keyCode === 13) {
-      const response = await dispatch(
-        addMessage({
-          receiver: infoFriend?._id,
-          content: inputText.trim(),
-        })
-      );
+      const body = {
+        receiver: infoFriend?._id,
+        content: inputText.trim(),
+      };
 
-      if (response?.payload?.status === 200) {
+      const formData = new FormData();
+      Object.keys(body).forEach((key) => formData.append(key, body[key]));
+      formData.append("image", urlImg);
+      axios({
+        method: "post",
+        url: `${BASE_URL}/api/chat/inbox`,
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+        data: formData,
+      }).then((response) => {
+        if (response?.status === 200) {
+          const data = {
+            idFriend: infoFriend?._id,
+            idMe: infoUser?._id,
+          };
+          socket?.emit("inbox_user", data);
+        } else {
+          dispatch(
+            showModalMessage({
+              type: "ERROR",
+              msg: "Đã có lỗi xảy ra, có thể tài khoản của bạn hoặc người gửi đã bị khóa!",
+            })
+          );
+        }
+        dispatch(getListMessage(infoFriend._id));
+        setInputText("");
+        setPreviewImage("");
+        setUrlImg("");
+      });
+    }
+  };
+
+  const sendMessage = async () => {
+    const body = {
+      receiver: infoFriend?._id,
+      content: inputText.trim(),
+    };
+
+    const formData = new FormData();
+    Object.keys(body).forEach((key) => formData.append(key, body[key]));
+    formData.append("image", urlImg);
+    axios({
+      method: "post",
+      url: `${BASE_URL}/api/chat/inbox`,
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: "Bearer " + localStorage.getItem("token"),
+      },
+      data: formData,
+    }).then((response) => {
+      if (response?.status === 200) {
         const data = {
           idFriend: infoFriend?._id,
           idMe: infoUser._id,
         };
         socket?.emit("inbox_user", data);
       } else {
-        console.log("ERRR");
         dispatch(
           showModalMessage({
             type: "ERROR",
@@ -69,21 +135,27 @@ const ModelChat = ({ open, close }) => {
       }
       dispatch(getListMessage(infoFriend._id));
       setInputText("");
-    }
+      setPreviewImage("");
+      setUrlImg("");
+    });
   };
+
   React.useEffect(() => {
     socket?.on("get_message", async (data) => {
-      if (infoUser._id === data.idFriend) {
+      if (infoUser?._id === data.idMe) {
         await dispatch(getListMessage(infoFriend._id));
       }
     });
   }, [socket]);
-  React.useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      dispatch(getRooms());
-    }
-  }, [infoFriend?._id]);
+  // React.useEffect(() => {
+  //   const token = localStorage.getItem("token");
+  //   if (token) {
+  //     dispatch(getRooms());
+  //   }
+  // }, [infoFriend?._id]);
+  const componentStyle = {
+    height: previewImage ? "37vh" : "43vh",
+  };
   return (
     <>
       {open && (
@@ -96,8 +168,9 @@ const ModelChat = ({ open, close }) => {
               </IconButton>
             </div>
           </div>
-          <div className="row gap-0">
-            <div className="col-4 border-end">
+          <div className="row gap-0 bodyChat">
+            {/* room */}
+            <div className="col-4 border-end mt-2 roomChat">
               {rooms &&
                 rooms?.length > 0 &&
                 rooms.map((room, index) => (
@@ -105,7 +178,7 @@ const ModelChat = ({ open, close }) => {
                     onClick={() => {
                       if (room?.users[0].user._id === infoUser._id) {
                         dispatch(getListMessage(room?.users[1].user._id));
-                        dispatch(getProfileFriend(room?.users[1].user._id));
+                        // dispatch(getProfileFriend(room?.users[1].user._id));
                         dispatch(
                           updateCountMess({
                             userId: room?.users[1].user._id,
@@ -114,7 +187,7 @@ const ModelChat = ({ open, close }) => {
                         );
                       } else {
                         dispatch(getListMessage(room?.users[0].user._id));
-                        dispatch(getProfileFriend(room?.users[0].user._id));
+                        // dispatch(getProfileFriend(room?.users[0].user._id));
                         dispatch(
                           updateCountMess({
                             userId: room?.users[0].user._id,
@@ -188,48 +261,123 @@ const ModelChat = ({ open, close }) => {
                   </div>
                 ))}
             </div>
-            <div className="col-8 border-start ">
+            {/* message */}
+            <div className="col-8 border-start mt-2 messageAndInput">
               <div>
-                <ul className="message-list">
+                <ul className="message-list " style={componentStyle}>
                   {listMessage &&
                     listMessage.length > 0 &&
                     listMessage.map((item) =>
                       infoUser._id === item.sender ? (
-                        <li className="message-item outgoing">
-                          <div className="message-content">
-                            <span>{item.content}</span>
-                            <br />
-                            <span className="message-time px-0">
-                              {moment(item.createdAt).format(
-                                "DD-MM-YYYY,HH:mm:ss"
-                              )}
-                            </span>
-                          </div>
-                        </li>
+                        <>
+                          {item.content && (
+                            <li className="message-item outgoing">
+                              <div className="message-content">
+                                <span>{item.content}</span>
+                                <br />
+                                <span className="message-time px-0">
+                                  {moment(item.createdAt).format(
+                                    "DD-MM-YYYY,HH:mm:ss"
+                                  )}
+                                </span>
+                              </div>
+                            </li>
+                          )}
+                          {item.image && (
+                            <li className="message-item outgoing">
+                              <span>
+                                <img
+                                  src={item.image}
+                                  style={{ width: 150, height: 150 }}
+                                />
+                              </span>
+                            </li>
+                          )}
+                        </>
                       ) : (
-                        <li className="message-item incoming">
-                          <div className="message-content ">
-                            <span>{item.content}</span>
-                            <br />
-                            <span className="message-time">
-                              {moment(item.createdAt).format(
-                                "DD-MM-YYYY,HH:mm:ss"
-                              )}
-                            </span>
-                          </div>
-                        </li>
+                        <>
+                          {item.content && (
+                            <li className="message-item incoming">
+                              <div className="message-content">
+                                <span>{item.content}</span>
+                                <br />
+                                <span className="message-time px-0">
+                                  {moment(item.createdAt).format(
+                                    "DD-MM-YYYY,HH:mm:ss"
+                                  )}
+                                </span>
+                              </div>
+                            </li>
+                          )}
+                          {item.image && (
+                            <li className="message-item incoming">
+                              <span>
+                                <img
+                                  src={item.image}
+                                  style={{ width: 150, height: 150 }}
+                                />
+                              </span>
+                            </li>
+                          )}
+                        </>
                       )
                     )}
                 </ul>
-                <div className="input-container">
-                  <input
-                    type="text"
-                    placeholder="Nhập tin nhắn..."
-                    value={inputText}
-                    onChange={handleChangeInput}
-                    onKeyDown={keyPress}
-                  />
-                  <Button>Gửi</Button>
+                <div className="row border-top" style={{ height: "5vh" }}>
+                  {previewImage && (
+                    <div
+                      style={{
+                        width: "45px",
+                        height: "45px",
+                        backgroundImage: `url(${previewImage})`,
+                        backgroundPosition: "center",
+                        backgroundSize: "cover",
+                        backgroundRepeat: "no-repeat",
+                        marginLeft: "55px",
+                        border: "1px solid ",
+                        marginTop: "5px",
+                        borderColor: "#d8d3d3",
+                        borderRadius: "12px",
+                      }}
+                    />
+                  )}
+                  <div className="input-container mt-1">
+                    <div className="mt-auto mb-auto me-2">
+                      <input
+                        className="d-none"
+                        accept="image/*"
+                        id="contained-button-file"
+                        multiple
+                        type="file"
+                        onChange={handleImageChange}
+                      />
+                      <label
+                        htmlFor="contained-button-file"
+                        className="btn pt-0 px-1 py-1"
+                      >
+                        <div>
+                          <AddAPhotoOutlinedIcon
+                            fontSize="small"
+                            color="primary"
+                          />
+                        </div>
+                      </label>
+                    </div>
+                    <input
+                      type="text"
+                      placeholder="Nhập tin nhắn..."
+                      value={inputText}
+                      onChange={handleChangeInput}
+                      onKeyDown={keyPress}
+                    />
+                    <Button
+                      endIcon={<SendIcon />}
+                      onClick={sendMessage}
+                      size="small"
+                    >
+                      Gửi
+                    </Button>
+                  </div>
                 </div>
               </div>
             </div>

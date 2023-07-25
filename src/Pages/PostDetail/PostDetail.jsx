@@ -385,10 +385,13 @@ const PostDetail = () => {
                 <ul className="list-group mt-4" style={{ listStyle: "none" }}>
                   {post.comments?.length > 0 &&
                     post.comments.map((comment, index) => (
-                      <li className="d-flex  ms-3 mb-3 list_comments">
+                      <li
+                        className="d-flex  ms-3 mb-3 list_comments"
+                        key={index}
+                      >
                         <Avatar
                           src={comment?.userId.avatar}
-                          className="my-auto border border-dark"
+                          className="my-auto border "
                         />
                         <span className="d-flex flex-column ms-3 list_comments_text">
                           <span

@@ -191,7 +191,7 @@ export default function ListUser() {
   const searchUser = (name) => {
     axios({
       method: "get",
-      url: `${BASE_URL}/api/user/search?name=${name}`,
+      url: `${BASE_URL}/api/users/search?name=${name}`,
       headers: {
         "Content-Type": "application/json",
         Authorization: "Bearer " + localStorage.getItem("token"),

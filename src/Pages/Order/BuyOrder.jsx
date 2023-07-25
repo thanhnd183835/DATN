@@ -51,7 +51,7 @@ const BuyOrder = () => {
     .filter((item) => item.paymentStatus === 0)
     .map((product) => product.order)
     .flat();
-  console.log(payment);
+ 
   return (
     <div>
       <div>

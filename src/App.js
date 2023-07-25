@@ -30,20 +30,22 @@ import Dashboard from "./Pages/Admin/Dashboard";
 import RegisterSell from "./Pages/RegisterSell/RegisterSell";
 import OrderDetail from "./Pages/OrderDetail/OrderDetail";
 
-const socket = io.connect(BASE_URL);
 function App(props) {
+  const socket = io.connect(BASE_URL);
+
   const dispatch = useDispatch();
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
 
-  const isAuthenticated = localStorage.getItem("token");
-  useEffect(() => {
-    dispatch(setSocket(socket));
-  }, []);
+  const isAuthenticated =
+    useSelector((state) => state?.auth?.user?.data?.token) ||
+    localStorage.getItem("token");
 
   useEffect(() => {
     dispatch(hideModalMessage());
   }, []);
-
+  useEffect(() => {
+    dispatch(setSocket(socket));
+  }, []);
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token) {
@@ -55,10 +57,9 @@ function App(props) {
     <>
       <BrowserRouter>
         <Routes>
-          {/* <Route path="/" element={<HomePage />} /> */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          {isAuthenticated !== null && (
+          {isAuthenticated ? (
             <>
               <Route
                 path="/"
@@ -75,6 +76,8 @@ function App(props) {
               <Route path="/register-sell" element={<RegisterSell />} />
               <Route path="/order-detail/:id" element={<OrderDetail />} />
             </>
+          ) : (
+            <Route path="/login" element={<LoginPage />} />
           )}
         </Routes>
         <ModalMessage />

@@ -35,6 +35,7 @@ import { NumberForMatter } from "../../Ultils/functions";
 import { Button } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import ModelChat from "../../Component/Chat/ModelChat";
+import { addMessage, getRooms } from "../../Redux/chat/chat.slice";
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -231,6 +232,7 @@ const ProfileFriend = (props) => {
                   className="ms-2 mt-2 "
                   onClick={() => {
                     setIsOpenModelChat(true);
+                    dispatch(addMessage());
                   }}
                   variant="contained"
                   color="warning"

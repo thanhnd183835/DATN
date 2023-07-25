@@ -46,8 +46,8 @@ const style = {
 };
 const ShowPicture = (props) => {
   const classes = useStyles();
-  const [liked, setLiked] = useState(props.liked);
-  const [numberLikes, setNumberLikes] = useState(props.likes);
+  const [liked, setLiked] = useState(props?.liked);
+  const [numberLikes, setNumberLikes] = useState(props?.likes);
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const [openError, setOpenError] = useState(false);
@@ -79,33 +79,28 @@ const ShowPicture = (props) => {
   };
   const addToCart = async (data) => {
     const body = {
-      UrlImage: data.picture,
-      name: data.name,
+      UrlImage: data?.picture,
+      name: data?.name,
       quantity: 1,
-      price: data.price,
-      postId: data.id,
-      postBy: data.postBy,
+      price: data?.price,
+      postId: data?.id,
+      postBy: data?.postBy,
       statusCart: 0,
       orderId: "",
     };
 
-    const token = localStorage.getItem("token");
-    if (!token) {
-      navigate("/login");
-    } else {
-      const res = await dispatch(addCart(body));
-      if (res?.error?.message === "Request failed with status code 404") {
-        setOpenError(true);
-        setTimeout(() => {
-          setOpenError(false);
-        }, 1000);
-      } else if (res?.payload?.status === 201) {
-        setOpen(true);
-        setTimeout(() => {
-          setOpen(false);
-        }, 800);
-        socket?.emit("add_cart", body);
-      }
+    const res = await dispatch(addCart(body));
+    if (res?.error?.message === "Request failed with status code 404") {
+      setOpenError(true);
+      setTimeout(() => {
+        setOpenError(false);
+      }, 1000);
+    } else if (res?.payload?.status === 201) {
+      setOpen(true);
+      setTimeout(() => {
+        setOpen(false);
+      }, 800);
+      socket?.emit("add_cart", body);
     }
   };
   return (
@@ -154,7 +149,7 @@ const ShowPicture = (props) => {
               className="overflow-text fw-bold pt-2"
               style={{ fontSize: 13 }}
             >
-              {props.name}
+              {props?.name}
             </Typography>
             <Typography variant="body2">
               <p className=" f-3 mb-0">
@@ -166,7 +161,7 @@ const ShowPicture = (props) => {
                     fontWeight: "600",
                   }}
                 >
-                  {NumberForMatter(props.price)}.đ
+                  {NumberForMatter(props?.price)}.đ
                 </span>
               </p>
             </Typography>

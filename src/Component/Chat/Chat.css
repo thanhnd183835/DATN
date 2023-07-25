@@ -18,7 +18,7 @@
     list-style: none;
     flex: 1;
     padding: 0;
-    height: 45vh;
+    /* height: 43vh; */
     overflow-y: scroll;
     scrollbar-color:  #f0f0f0;
 }
@@ -42,7 +42,7 @@
 .input-container input {
     flex: 1;
     border-radius: 4px;
-    border: 1px solid gray;
+    border: 1px solid rgb(179, 175, 175);
 }
 
 .input-container button {
@@ -128,4 +128,19 @@
 .message-time {
     font-size: 10px;
     color: #777777;
+}
+.bodyChat {
+    height: 53vh;
+}
+.roomChat {
+    height: 52vh;
+}
+.messageAndInput {
+    height: 52vh;
+}
+.listMassage {
+    height:43vh;
+}
+.inputChat{
+    height: 5vh;
 }

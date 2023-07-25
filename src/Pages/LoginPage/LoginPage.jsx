@@ -2,6 +2,7 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 import { useState } from "react";
 import icon_google from "../../Assets/Images/icons/google.svg";
+import Button from "@mui/material/Button";
 import { useForm, Controller } from "react-hook-form";
 import TextField from "@mui/material/TextField";
 import { useDispatch } from "react-redux";
@@ -15,7 +16,7 @@ import { showModalMessage } from "../../Redux/message/message.slice";
 import FacebookLogin from "react-facebook-login";
 import { useGoogleLogin } from "@react-oauth/google";
 import Footer from "../../Component/Footer/Footer";
-
+import GoogleLogin from "react-google-login";
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -48,22 +49,25 @@ const LoginPage = () => {
         access_token: response.accessToken,
       })
     );
-
+    console.log(res);
+    await localStorage.setItem("token", res?.payload?.data?.token);
     if (res.payload.status === 200) {
-      navigate("/profile");
+      navigate("/");
     }
   };
 
   const loginGoogle = useGoogleLogin({
     flow: "implicit",
     onSuccess: async (codeResponse) => {
+      console.log(codeResponse);
       const res = await dispatch(
         signInGoogle({
           access_token: codeResponse.access_token,
         })
       );
+      console.log(res);
       if (res) {
-        navigate("/register");
+        navigate("/");
       }
     },
     onError: (errorResponse) => console.log(errorResponse),
@@ -129,7 +133,7 @@ const LoginPage = () => {
                     </div>
                     <div className="d-xxl-flex d-xl-inline-flex d-lg-flex gap-2 ">
                       <div className="d-xxl-flex d-xl-inline-flex d-lg-flex mb-xxl-0 mb-xl-0 mb-lg-0 mb-sm-2">
-                        <button
+                        <Button
                           onClick={() => loginGoogle()}
                           style={{
                             borderColor: "#074db5",
@@ -149,7 +153,7 @@ const LoginPage = () => {
                             }}
                           />
                           Đăng nhập bằng Google
-                        </button>
+                        </Button>
                       </div>
                       <div className="">
                         <FacebookLogin

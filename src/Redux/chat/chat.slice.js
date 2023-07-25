@@ -48,15 +48,14 @@ const chatSlice = createSlice({
     },
     updateCountMess(state, action) {
       const newArr = state.countNewMess;
-      console.log("action: ", action.payload);
+
       const checkExists = newArr?.filter(
         (item) => item.userId === action.payload?.userId
       );
       if (checkExists?.length === 0 && action.payload?.action === "PUSH")
         state.countNewMess?.push(action.payload);
-      console.log("state.countNewMess: -------------: ", state.countNewMess);
+
       if (checkExists?.length > 0 && action.payload?.action === "DELETE") {
-        console.log("DELETE");
         state.countNewMess = newArr?.filter(
           (item) => item.userId !== action.payload?.userId
         );

@@ -7,7 +7,7 @@ const initialState = {
 };
 
 const socketSlice = createSlice({
-  name: "post",
+  name: "socket",
   initialState: initialState,
   reducers: {
     setSocket: (state, action) => {

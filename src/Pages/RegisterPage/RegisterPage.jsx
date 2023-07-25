@@ -58,7 +58,7 @@ const RegisterPage = () => {
         })
       );
       if (res) {
-        navigate("/register");
+        navigate("/");
       }
     },
     onError: (errorResponse) => console.log(errorResponse),
