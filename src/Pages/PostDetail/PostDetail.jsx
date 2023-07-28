@@ -179,7 +179,7 @@ const PostDetail = () => {
     };
 
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       const res = await dispatch(addCart(body));

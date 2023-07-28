@@ -74,7 +74,7 @@ const CartDetail = () => {
   const date = moment(new Date()).format("DD-MM-YYYY,HH:mm:ss");
   const fetchData = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({

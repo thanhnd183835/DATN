@@ -21,7 +21,7 @@ const OrderOfSeller = () => {
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({
@@ -59,7 +59,7 @@ const OrderOfSeller = () => {
       idOrder: data.orderId,
     };
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       const res = await dispatch(refuseItemOrder(body));

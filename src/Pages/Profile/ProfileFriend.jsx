@@ -35,7 +35,11 @@ import { NumberForMatter } from "../../Ultils/functions";
 import { Button } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import ModelChat from "../../Component/Chat/ModelChat";
-import { addMessage, getRooms } from "../../Redux/chat/chat.slice";
+import {
+  addMessage,
+  getListMessage,
+  getRooms,
+} from "../../Redux/chat/chat.slice";
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -73,6 +77,7 @@ const ProfileFriend = (props) => {
   const infoFriend = useSelector(
     (state) => state?.user?.profileFriend?.data?.data
   );
+  const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
   const [expanded, setExpanded] = React.useState(false);
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
@@ -96,7 +101,7 @@ const ProfileFriend = (props) => {
     setValue(newValue);
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (token === null) {
         navigate("/login");
       } else {
         axios({
@@ -117,13 +122,13 @@ const ProfileFriend = (props) => {
   };
 
   useEffect(() => {
-    dispatch(getProfileFriend(params.id));
-    dispatch(getPostFriend(params.id));
-    const fetchData = async () => {
-      const token = localStorage.getItem("token");
-      if (!token) {
-        navigate("/login");
-      } else {
+    const token = localStorage.getItem("token");
+    if (token === null) {
+      navigate("/login");
+    } else {
+      dispatch(getProfileFriend(params?.id));
+      dispatch(getPostFriend(params?.id));
+      const fetchData = async () => {
         axios({
           method: "get",
           url: `${BASE_URL}/api/post/get-list-typeItem/${params.id}/all`,
@@ -136,9 +141,9 @@ const ProfileFriend = (props) => {
             setListPost(response.data.data);
           }
         });
-      }
-    };
-    fetchData();
+      };
+      fetchData();
+    }
   }, []);
 
   const onClose = () => {
@@ -232,7 +237,7 @@ const ProfileFriend = (props) => {
                   className="ms-2 mt-2 "
                   onClick={() => {
                     setIsOpenModelChat(true);
-                    dispatch(addMessage());
+                    // dispatch(getListMessage(rooms[0]?.users[1].user._id));
                   }}
                   variant="contained"
                   color="warning"
@@ -340,7 +345,7 @@ const ProfileFriend = (props) => {
                   picture={item.UrlImg}
                   id={item?._id}
                   liked={
-                    item.likes.find((i) => i.userId === infoUser._id)
+                    item.likes.find((i) => i.userId === infoUser?._id)
                       ? true
                       : false
                   }

@@ -23,7 +23,7 @@ const OrderDetail = () => {
 
   const fetchData = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({

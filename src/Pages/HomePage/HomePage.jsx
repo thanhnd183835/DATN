@@ -43,7 +43,7 @@ const HomePage = () => {
     setValue(newValue);
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (token === null) {
         navigate("/login");
       } else {
         axios({
@@ -64,23 +64,27 @@ const HomePage = () => {
   };
   useEffect(() => {
     const fetchData = async (page) => {
-      axios({
-        method: "get",
-        url: `${BASE_URL}/api/post/get-all-post`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-        params: {
-          limit: 18,
-          page: page,
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          setListPost((prevData) => [...prevData, ...response.data.data]);
-          setIsLastPage(response.data.isLastPage);
-        }
-      });
+      const token = localStorage.getItem("token");
+      if (token === null) {
+        navigate("/login");
+      } else
+        axios({
+          method: "get",
+          url: `${BASE_URL}/api/post/get-all-post`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          params: {
+            limit: 18,
+            page: page,
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            setListPost((prevData) => [...prevData, ...response.data.data]);
+            setIsLastPage(response.data.isLastPage);
+          }
+        });
     };
     fetchData(page);
   }, [page]);
@@ -89,7 +93,7 @@ const HomePage = () => {
     setSubDiViSon(event.target.value);
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (token === null) {
         navigate("/login");
       } else {
         axios({

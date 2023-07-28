@@ -93,7 +93,7 @@ const Profile = () => {
     setValue(newValue);
     const fetchData = async () => {
       const token = localStorage.getItem("token");
-      if (!token) {
+      if (token === null) {
         navigate("/login");
       } else {
         axios({
@@ -121,7 +121,7 @@ const Profile = () => {
   };
   const fetchData = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({
@@ -228,7 +228,7 @@ const Profile = () => {
     const formData = new FormData();
     const infoImage = editorRef.state?.file;
     formData.append("image", infoImage);
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({

@@ -32,13 +32,13 @@ import OrderDetail from "./Pages/OrderDetail/OrderDetail";
 
 function App(props) {
   const socket = io.connect(BASE_URL);
-
   const dispatch = useDispatch();
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
 
   const isAuthenticated =
     useSelector((state) => state?.auth?.user?.data?.token) ||
     localStorage.getItem("token");
+  const token = localStorage.getItem("token");
 
   useEffect(() => {
     dispatch(hideModalMessage());
@@ -47,7 +47,6 @@ function App(props) {
     dispatch(setSocket(socket));
   }, []);
   useEffect(() => {
-    const token = localStorage.getItem("token");
     if (token) {
       dispatch(getMe());
     }
@@ -59,7 +58,7 @@ function App(props) {
         <Routes>
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
-          {isAuthenticated ? (
+          {!Boolean(isAuthenticated | token) ? (
             <>
               <Route
                 path="/"

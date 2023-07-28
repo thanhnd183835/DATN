@@ -16,7 +16,7 @@ import { showModalMessage } from "../../Redux/message/message.slice";
 import FacebookLogin from "react-facebook-login";
 import { useGoogleLogin } from "@react-oauth/google";
 import Footer from "../../Component/Footer/Footer";
-import GoogleLogin from "react-google-login";
+
 const LoginPage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -44,14 +44,15 @@ const LoginPage = () => {
     }
   };
   const responseFacebook = async (response) => {
+    localStorage.clear();
     const res = await dispatch(
       signInFacebook({
         access_token: response.accessToken,
       })
     );
-    console.log(res);
-    await localStorage.setItem("token", res?.payload?.data?.token);
+
     if (res.payload.status === 200) {
+      await localStorage.setItem("token", res?.payload?.data?.token);
       navigate("/");
     }
   };
@@ -118,8 +119,8 @@ const LoginPage = () => {
           </div>
           <div className="d-flex flex-lg-row justify-content-lg-end pt-4 ps-5 pe-5 pb-1 w-100">
             <div
-              className="bg-body d-flex justify-content-center rounded-4  pt-4 ps-5 pe-5 pb-1"
-              style={{ height: "70vh" }}
+              className="bg-body d-flex justify-content-center rounded-4  pt-4 ps-5 pe-5 pb-1 border shadow p-3"
+              style={{ height: "550px" }}
             >
               <div className="">
                 <form
@@ -140,7 +141,9 @@ const LoginPage = () => {
                             borderRadius: "30px",
                             color: "#000000",
                             textAlign: "center",
+                            textTransform: "capitalize",
                           }}
+                          variant="outlined"
                         >
                           <img
                             src={icon_google}

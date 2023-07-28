@@ -38,6 +38,14 @@ const ModelChat = ({ open, close }) => {
   );
   const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
   register("my-locale", localeFunc);
+  const messagesEnd = React.useRef(null);
+
+  const scrollToBottom = () => {
+    const scroll =
+      messagesEnd?.current?.scrollHeight - messagesEnd?.current?.clientHeight;
+    messagesEnd.current?.scrollTo(0, scroll);
+    console.log(scroll);
+  };
   const handleImageChange = async (e) => {
     const selected = e.target.files[0];
     setUrlImg(selected);
@@ -93,7 +101,8 @@ const ModelChat = ({ open, close }) => {
             })
           );
         }
-        dispatch(getListMessage(infoFriend._id));
+        scrollToBottom();
+        dispatch(getListMessage(infoFriend?._id));
         setInputText("");
         setPreviewImage("");
         setUrlImg("");
@@ -122,7 +131,7 @@ const ModelChat = ({ open, close }) => {
       if (response?.status === 200) {
         const data = {
           idFriend: infoFriend?._id,
-          idMe: infoUser._id,
+          idMe: infoUser?._id,
         };
         socket?.emit("inbox_user", data);
       } else {
@@ -133,7 +142,8 @@ const ModelChat = ({ open, close }) => {
           })
         );
       }
-      dispatch(getListMessage(infoFriend._id));
+      scrollToBottom();
+      dispatch(getListMessage(infoFriend?._id));
       setInputText("");
       setPreviewImage("");
       setUrlImg("");
@@ -142,17 +152,19 @@ const ModelChat = ({ open, close }) => {
 
   React.useEffect(() => {
     socket?.on("get_message", async (data) => {
-      if (infoUser?._id === data.idMe) {
-        await dispatch(getListMessage(infoFriend._id));
+      if (infoUser?._id === data.idFriend) {
+        scrollToBottom();
+        await dispatch(getListMessage(infoFriend?._id));
       }
     });
   }, [socket]);
-  // React.useEffect(() => {
-  //   const token = localStorage.getItem("token");
-  //   if (token) {
-  //     dispatch(getRooms());
-  //   }
-  // }, [infoFriend?._id]);
+  React.useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token !== null) {
+      scrollToBottom();
+      dispatch(getRooms());
+    }
+  }, [infoFriend?._id]);
   const componentStyle = {
     height: previewImage ? "37vh" : "43vh",
   };
@@ -178,6 +190,7 @@ const ModelChat = ({ open, close }) => {
                     onClick={() => {
                       if (room?.users[0].user._id === infoUser._id) {
                         dispatch(getListMessage(room?.users[1].user._id));
+                        scrollToBottom();
                         // dispatch(getProfileFriend(room?.users[1].user._id));
                         dispatch(
                           updateCountMess({
@@ -187,6 +200,7 @@ const ModelChat = ({ open, close }) => {
                         );
                       } else {
                         dispatch(getListMessage(room?.users[0].user._id));
+                        scrollToBottom();
                         // dispatch(getProfileFriend(room?.users[0].user._id));
                         dispatch(
                           updateCountMess({
@@ -264,7 +278,11 @@ const ModelChat = ({ open, close }) => {
             {/* message */}
             <div className="col-8 border-start mt-2 messageAndInput">
               <div>
-                <ul className="message-list " style={componentStyle}>
+                <ul
+                  ref={messagesEnd}
+                  className="message-list "
+                  style={componentStyle}
+                >
                   {listMessage &&
                     listMessage.length > 0 &&
                     listMessage.map((item) =>

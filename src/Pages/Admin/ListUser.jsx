@@ -130,7 +130,7 @@ export default function ListUser() {
   };
   const fetchData = async () => {
     const token = localStorage.getItem("token");
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({

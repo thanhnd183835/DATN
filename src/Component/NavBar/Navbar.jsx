@@ -90,7 +90,7 @@ const NavBar = () => {
   const [openSearch, setOpenSearch] = useState(false);
   const [errorSearch, setErrorSearch] = useState(false);
   const wrapperRef = useRef(null);
-
+  const token = localStorage.getItem("token");
   const handleProfileMenuOpen = (event) => {
     setAnchorEl(event.currentTarget);
   };
@@ -140,13 +140,17 @@ const NavBar = () => {
 
   useEffect(() => {
     socket?.on("getNoti", async (data) => {
-      if (infoUser?.userName === data?.userNameCreatePost) {
+      if (infoUser?.userName === data?.userNameCreatePost && token !== null) {
         await fetchNotification();
+      } else {
+        navigate("/login");
       }
     });
     socket?.on("getNoti", async (data) => {
-      if (data) {
+      if (data && token !== null) {
         await fetchData();
+      } else {
+        navigate("/login");
       }
     });
   }, [socket]);
@@ -213,8 +217,10 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    fetchNotification();
-    fetchData();
+    if (token !== null) {
+      fetchNotification();
+      fetchData();
+    }
   }, []);
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -290,7 +296,7 @@ const NavBar = () => {
               display: "block",
               position: "absolute",
               top: 0,
-              right: 230,
+              right: 325,
               width: 20,
               height: 20,
               bgcolor: "background.paper",
@@ -541,7 +547,7 @@ const NavBar = () => {
           position="fixed"
           style={{ height: "6rem", backgroundColor: "#ffba00" }}
         >
-          {infoUser?.role === 0 && (
+          {infoUser && infoUser?.role === 0 && (
             <Link
               style={{
                 color: "#0434d1",

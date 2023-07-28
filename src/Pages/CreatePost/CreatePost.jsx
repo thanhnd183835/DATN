@@ -93,7 +93,7 @@ const CreatePost = (props) => {
     const formData = new FormData();
     Object.keys(body).forEach((key) => formData.append(key, body[key]));
     formData.append("image", urlImg);
-    if (!token) {
+    if (token === null) {
       navigate("/login");
     } else {
       axios({

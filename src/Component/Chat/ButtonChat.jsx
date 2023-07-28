@@ -14,8 +14,7 @@ const ButtonChat = () => {
   const handleShowBoxChat = () => {
     setOpenChat(true);
     setOpenIcon(false);
-    dispatch(getRooms());
-    dispatch(getListMessage(rooms[0].users[0].user._id));
+    // dispatch(getRooms());
   };
   const handCloseModelChat = () => {
     setOpenChat(false);
