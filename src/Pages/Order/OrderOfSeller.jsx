@@ -89,6 +89,7 @@ const OrderOfSeller = () => {
             margin: "auto",
             maxHeight: 600,
             overflowY: "auto",
+            height: 500,
           }}
           className="border"
         >

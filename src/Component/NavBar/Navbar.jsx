@@ -140,17 +140,13 @@ const NavBar = () => {
 
   useEffect(() => {
     socket?.on("getNoti", async (data) => {
-      if (infoUser?.userName === data?.userNameCreatePost && token !== null) {
+      if (infoUser?.userName === data?.userNameCreatePost) {
         await fetchNotification();
-      } else {
-        navigate("/login");
       }
     });
     socket?.on("getNoti", async (data) => {
-      if (data && token !== null) {
+      if (data) {
         await fetchData();
-      } else {
-        navigate("/login");
       }
     });
   }, [socket]);
@@ -217,10 +213,8 @@ const NavBar = () => {
   };
 
   useEffect(() => {
-    if (token !== null) {
-      fetchNotification();
-      fetchData();
-    }
+    fetchNotification();
+    fetchData();
   }, []);
   useEffect(() => {
     const handleClickOutside = (event) => {

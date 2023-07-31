@@ -8,13 +8,14 @@ import { getListMessage, getRooms } from "../../Redux/chat/chat.slice";
 const ButtonChat = () => {
   const dispatch = useDispatch();
   const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
+
   const [openChat, setOpenChat] = React.useState(false);
   const [openIcon, setOpenIcon] = React.useState(true);
 
   const handleShowBoxChat = () => {
     setOpenChat(true);
     setOpenIcon(false);
-    // dispatch(getRooms());
+    dispatch(getRooms());
   };
   const handCloseModelChat = () => {
     setOpenChat(false);

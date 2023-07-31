@@ -202,7 +202,6 @@ const CartDetail = () => {
       const res = await dispatch(createOrder(body));
       if (res.payload.status === 201) {
         setOpenDialog(false);
-        console.log(res);
         navigate("/order-by");
       }
     } else {
@@ -225,10 +224,9 @@ const CartDetail = () => {
             language: "vn",
           },
         }).then((response) => {
-          // console.log(response);
           if (response) {
             // @ts-ignore1
-            window.open(response.data.data, "_blank");
+            window.open(response.data.data, "_self");
           }
         });
       }

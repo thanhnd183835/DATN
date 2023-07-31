@@ -68,7 +68,7 @@ const BuyOrder = () => {
           }}
           className="border"
         >
-          {payment.length > 0 ? (
+          {payment.length > 0 &&
             payment?.map((items) => (
               <>
                 <div className="row ms-2 mt-2 mb-2" key={items._id}>
@@ -106,6 +106,62 @@ const BuyOrder = () => {
                   <div className="my-auto col-2 text-center">
                     <span>
                       <Chip label="đã thanh toán" color="success" />
+                    </span>
+                  </div>
+                  {items.statusCart === 0 ? (
+                    <div className="my-auto text-center text-danger col-2 ">
+                      <Chip label="Chờ xác nhận" color="warning" />
+                    </div>
+                  ) : items.statusCart === 2 ? (
+                    <div className="my-auto text-center text-danger col-2 ">
+                      <Chip label="Đã bị từ chối" color="error" />
+                    </div>
+                  ) : (
+                    <div className="my-auto text-center text-danger col-2 ">
+                      <Chip label="Đã được nhận" color="success" />
+                    </div>
+                  )}
+                </div>
+              </>
+            ))}
+          {notPayment.length > 0 ? (
+            notPayment?.map((items) => (
+              <>
+                <div className="row ms-2 mt-2 mb-2" key={items._id}>
+                  <div className="col-1 ">
+                    <img
+                      alt="image post"
+                      src={items.UrlImage}
+                      style={{ width: 60 }}
+                    />
+                  </div>
+
+                  <div
+                    style={{ fontSize: 15 }}
+                    className="my-auto py-auto col-3 fw-bold"
+                  >
+                    {items.name}
+                  </div>
+                  {items.price < 300000 ? (
+                    <div className="my-auto text-danger col-2">
+                      Giá: {NumberForMatter(items.price + 15000)}.đ
+                    </div>
+                  ) : (
+                    <div className="my-auto text-danger col-2">
+                      Giá: {NumberForMatter(items.price)}.đ
+                    </div>
+                  )}
+                  <div className="my-auto col-1">
+                    <span className="text-danger">số lượng:</span>
+                    {items.quantity}
+                  </div>
+                  <div className="my-auto col-1">
+                    <span className="text-danger">Ngày Đặt: </span>
+                    {moment(items.createdAt).format("DD/MM/YYYY, HH:mm:ss")}
+                  </div>
+                  <div className="my-auto col-2 text-center">
+                    <span>
+                      <Chip label="Chưa thanh toán" color="error" />
                     </span>
                   </div>
                   {items.statusCart === 0 ? (

@@ -129,6 +129,7 @@ const PostDetail = () => {
       socket?.emit("like_post", data);
     }
   };
+
   const handleAddComment = async () => {
     setCommentValue("");
     const data = {
@@ -166,7 +167,9 @@ const PostDetail = () => {
   const handleChange = (event) => {
     setValue(event.target.value);
   };
+
   const addToCart = async (data) => {
+    const token = localStorage.getItem("token");
     const body = {
       UrlImage: data.UrlImg,
       name: data.name,
@@ -178,7 +181,6 @@ const PostDetail = () => {
       orderId: "",
     };
 
-    const token = localStorage.getItem("token");
     if (token === null) {
       navigate("/login");
     } else {

@@ -103,6 +103,7 @@ const ModelChat = ({ open, close }) => {
         }
         scrollToBottom();
         dispatch(getListMessage(infoFriend?._id));
+        dispatch(getRooms());
         setInputText("");
         setPreviewImage("");
         setUrlImg("");
@@ -144,6 +145,7 @@ const ModelChat = ({ open, close }) => {
       }
       scrollToBottom();
       dispatch(getListMessage(infoFriend?._id));
+      dispatch(getRooms());
       setInputText("");
       setPreviewImage("");
       setUrlImg("");
