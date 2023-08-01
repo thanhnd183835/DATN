@@ -35,6 +35,7 @@ import { NumberForMatter } from "../../Ultils/functions";
 import { Button } from "@mui/material";
 import ChatIcon from "@mui/icons-material/Chat";
 import ModelChat from "../../Component/Chat/ModelChat";
+import { getListMessage } from "../../Redux/chat/chat.slice";
 const useStyles = makeStyles(() => ({
   profileContainer: {
     width: "100%",
@@ -77,6 +78,7 @@ const ProfileFriend = (props) => {
   const [preview, setPreview] = useState(null);
   const [editorRef, setEditorRef] = useState(null);
   const [isOpenModelChat, setIsOpenModelChat] = useState(false);
+  const [idFriend, setIdFriend] = useState("");
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
   const listFollower = useSelector(
     (state) => state?.user?.followers?.data?.data
@@ -232,7 +234,8 @@ const ProfileFriend = (props) => {
                   className="ms-2 mt-2 "
                   onClick={() => {
                     setIsOpenModelChat(true);
-                    // dispatch(getListMessage(rooms[0]?.users[1].user._id));
+                    setIdFriend(infoFriend._id);
+                    dispatch(getListMessage(infoFriend._id));
                   }}
                   variant="contained"
                   color="warning"
@@ -372,6 +375,7 @@ const ProfileFriend = (props) => {
         <ModelChat
           open={isOpenModelChat}
           close={() => setIsOpenModelChat(false)}
+          idFriend={idFriend}
         />
         <Popup
           isOpen={isChangeAvatar}

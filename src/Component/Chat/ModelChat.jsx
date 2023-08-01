@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect, useState, useRef } from "react";
 import IconButton from "@mui/material/IconButton";
 import DisabledByDefaultIcon from "@mui/icons-material/DisabledByDefault";
 import { useSelector, useDispatch } from "react-redux";
@@ -21,13 +22,13 @@ import AddAPhotoOutlinedIcon from "@mui/icons-material/AddAPhotoOutlined";
 import SendIcon from "@mui/icons-material/Send";
 import axios from "axios";
 
-const ModelChat = ({ open, close }) => {
+const ModelChat = ({ open, close, idFriend }) => {
   const dispatch = useDispatch();
-  const [inputText, setInputText] = React.useState("");
-  const [openChat, setOpenChat] = React.useState(true);
-  const [active, setActive] = React.useState(0);
-  const [urlImg, setUrlImg] = React.useState("");
-  const [previewImage, setPreviewImage] = React.useState("");
+  const [idReceiver, setIdReceiver] = useState("");
+  const [inputText, setInputText] = useState("");
+  const [active, setActive] = useState(0);
+  const [urlImg, setUrlImg] = useState("");
+  const [previewImage, setPreviewImage] = useState("");
   const socket = useSelector((state) => state.socket.socket.payload);
   const listMessage = useSelector(
     (state) => state.chat?.listMessage?.data?.data?.room
@@ -36,16 +37,16 @@ const ModelChat = ({ open, close }) => {
   const infoFriend = useSelector(
     (state) => state.user.profileFriend?.data.data
   );
-  const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
+  const [rooms, setRooms] = useState([]);
   register("my-locale", localeFunc);
-  const messagesEnd = React.useRef(null);
+  const messagesEnd = useRef(null);
 
   const scrollToBottom = () => {
     const scroll =
       messagesEnd?.current?.scrollHeight - messagesEnd?.current?.clientHeight;
     messagesEnd.current?.scrollTo(0, scroll);
-    console.log(scroll);
   };
+
   const handleImageChange = async (e) => {
     const selected = e.target.files[0];
     setUrlImg(selected);
@@ -71,7 +72,7 @@ const ModelChat = ({ open, close }) => {
 
     if (e.keyCode === 13) {
       const body = {
-        receiver: infoFriend?._id,
+        receiver: idReceiver || idFriend,
         content: inputText.trim(),
       };
 
@@ -89,7 +90,7 @@ const ModelChat = ({ open, close }) => {
       }).then((response) => {
         if (response?.status === 200) {
           const data = {
-            idFriend: infoFriend?._id,
+            idFriend: idReceiver || idFriend,
             idMe: infoUser?._id,
           };
           socket?.emit("inbox_user", data);
@@ -101,9 +102,20 @@ const ModelChat = ({ open, close }) => {
             })
           );
         }
+        dispatch(getListMessage(idReceiver || idFriend));
+        axios({
+          method: "get",
+          url: `${BASE_URL}/api/chat/get-rooms`,
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+        }).then((response) => {
+          if (response.status === 200) {
+            setRooms(response?.data?.data);
+          }
+        });
         scrollToBottom();
-        dispatch(getListMessage(infoFriend?._id));
-        dispatch(getRooms());
         setInputText("");
         setPreviewImage("");
         setUrlImg("");
@@ -113,7 +125,7 @@ const ModelChat = ({ open, close }) => {
 
   const sendMessage = async () => {
     const body = {
-      receiver: infoFriend?._id,
+      receiver: idReceiver || idFriend,
       content: inputText.trim(),
     };
 
@@ -131,7 +143,7 @@ const ModelChat = ({ open, close }) => {
     }).then((response) => {
       if (response?.status === 200) {
         const data = {
-          idFriend: infoFriend?._id,
+          idFriend: idReceiver || idFriend,
           idMe: infoUser?._id,
         };
         socket?.emit("inbox_user", data);
@@ -143,30 +155,52 @@ const ModelChat = ({ open, close }) => {
           })
         );
       }
+      dispatch(getListMessage(idReceiver || idFriend));
+      axios({
+        method: "get",
+        url: `${BASE_URL}/api/chat/get-rooms`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }).then((response) => {
+        if (response.status === 200) {
+          setRooms(response?.data?.data);
+        }
+      });
       scrollToBottom();
-      dispatch(getListMessage(infoFriend?._id));
-      dispatch(getRooms());
       setInputText("");
       setPreviewImage("");
       setUrlImg("");
     });
   };
 
-  React.useEffect(() => {
+  useEffect(() => {
     socket?.on("get_message", async (data) => {
       if (infoUser?._id === data.idFriend) {
         scrollToBottom();
-        await dispatch(getListMessage(infoFriend?._id));
+        await dispatch(getListMessage(idReceiver || idFriend));
       }
     });
   }, [socket]);
-  React.useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem("token");
     if (token !== null) {
       scrollToBottom();
-      dispatch(getRooms());
+      axios({
+        method: "get",
+        url: `${BASE_URL}/api/chat/get-rooms`,
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: "Bearer " + localStorage.getItem("token"),
+        },
+      }).then((response) => {
+        if (response.status === 200) {
+          setRooms(response?.data?.data);
+        }
+      });
     }
-  }, [infoFriend?._id]);
+  }, []);
   const componentStyle = {
     height: previewImage ? "37vh" : "43vh",
   };
@@ -193,7 +227,7 @@ const ModelChat = ({ open, close }) => {
                       if (room?.users[0].user._id === infoUser._id) {
                         dispatch(getListMessage(room?.users[1].user._id));
                         scrollToBottom();
-                        // dispatch(getProfileFriend(room?.users[1].user._id));
+                        setIdReceiver(room?.users[1].user._id);
                         dispatch(
                           updateCountMess({
                             userId: room?.users[1].user._id,
@@ -203,7 +237,7 @@ const ModelChat = ({ open, close }) => {
                       } else {
                         dispatch(getListMessage(room?.users[0].user._id));
                         scrollToBottom();
-                        // dispatch(getProfileFriend(room?.users[0].user._id));
+                        setIdReceiver(room?.users[0].user._id);
                         dispatch(
                           updateCountMess({
                             userId: room?.users[0].user._id,
@@ -281,9 +315,9 @@ const ModelChat = ({ open, close }) => {
             <div className="col-8 border-start mt-2 messageAndInput">
               <div>
                 <ul
-                  ref={messagesEnd}
                   className="message-list "
                   style={componentStyle}
+                  ref={messagesEnd}
                 >
                   {listMessage &&
                     listMessage.length > 0 &&
