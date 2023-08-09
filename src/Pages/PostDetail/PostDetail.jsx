@@ -341,9 +341,9 @@ const PostDetail = () => {
                     >
                       Thêm vào giỏ hàng
                     </Button>
-                    <Button className="ms-3" variant="contained" color="error">
+                    {/* <Button className="ms-3" variant="contained" color="error">
                       Mua Ngay
-                    </Button>
+                    </Button> */}
                   </CardActions>
                 </div>
               </div>

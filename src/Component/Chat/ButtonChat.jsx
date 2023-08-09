@@ -4,6 +4,7 @@ import "./Chat.css";
 import MessageIcon from "@mui/icons-material/Message";
 import ModelChat from "./ModelChat";
 import { useSelector, useDispatch } from "react-redux";
+import { getRooms } from "../../Redux/chat/chat.slice";
 
 const ButtonChat = () => {
   const dispatch = useDispatch();

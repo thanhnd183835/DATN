@@ -31,7 +31,7 @@ import RegisterSell from "./Pages/RegisterSell/RegisterSell";
 import OrderDetail from "./Pages/OrderDetail/OrderDetail";
 
 function App(props) {
-  const socket = io.connect(BASE_URL);
+  const socket = io(BASE_URL, { path: "/socket.io" });
   const dispatch = useDispatch();
   const infoUser = useSelector((state) => state?.auth?.user?.data?.data);
 

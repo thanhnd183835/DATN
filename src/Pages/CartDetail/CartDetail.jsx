@@ -97,7 +97,6 @@ const CartDetail = () => {
 
   useEffect(() => {
     fetchData();
-    dispatch(getCartForMe());
   }, []);
   const handleDeleteItemCart = async (idItemCart) => {
     const res = await dispatch(deleteItemCart(idItemCart));
@@ -120,8 +119,10 @@ const CartDetail = () => {
           quantity: quantity - 1,
           CartId: props.CartId,
         };
-        dispatch(updateQuantity(body));
-        fetchData();
+        const res = await dispatch(updateQuantity(body));
+        if (res?.payload?.status === 200) {
+          fetchData();
+        }
       }
     };
 
@@ -132,8 +133,10 @@ const CartDetail = () => {
           quantity: quantity + 1,
           CartId: props.CartId,
         };
-        dispatch(updateQuantity(body));
-        fetchData();
+        const res = await dispatch(updateQuantity(body));
+        if (res?.payload?.status === 200) {
+          fetchData();
+        }
       }
     };
 

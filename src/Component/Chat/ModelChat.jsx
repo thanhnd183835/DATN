@@ -34,6 +34,7 @@ const ModelChat = ({ open, close, idFriend }) => {
     (state) => state.chat?.listMessage?.data?.data?.room
   );
   const infoUser = useSelector((state) => state.auth?.user?.data?.data);
+
   const infoFriend = useSelector(
     (state) => state.user.profileFriend?.data.data
   );
@@ -75,10 +76,72 @@ const ModelChat = ({ open, close, idFriend }) => {
         receiver: idReceiver || idFriend,
         content: inputText.trim(),
       };
-
       const formData = new FormData();
       Object.keys(body).forEach((key) => formData.append(key, body[key]));
       formData.append("image", urlImg);
+      if (body.receiver) {
+        axios({
+          method: "post",
+          url: `${BASE_URL}/api/chat/inbox`,
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
+          data: formData,
+        }).then((response) => {
+          if (response?.status === 200) {
+            const data = {
+              idFriend: idReceiver || idFriend,
+              idMe: infoUser?._id,
+            };
+            socket?.emit("inbox_user", data);
+          } else {
+            dispatch(
+              showModalMessage({
+                type: "ERROR",
+                msg: "Đã có lỗi xảy ra, có thể tài khoản của bạn hoặc người gửi đã bị khóa!",
+              })
+            );
+          }
+          axios({
+            method: "get",
+            url: `${BASE_URL}/api/chat/get-rooms`,
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }).then((response) => {
+            if (response.status === 200) {
+              setRooms(response?.data?.data);
+            }
+          });
+          dispatch(getListMessage(idReceiver || idFriend));
+          scrollToBottom();
+          setInputText("");
+          setPreviewImage("");
+          setUrlImg("");
+        });
+      } else {
+        dispatch(
+          showModalMessage({
+            type: "ERROR",
+            msg: "Bạn chưa chọn người liên hệ!",
+          })
+        );
+      }
+    }
+  };
+
+  const sendMessage = async () => {
+    const body = {
+      receiver: idReceiver || idFriend,
+      content: inputText.trim(),
+    };
+
+    const formData = new FormData();
+    Object.keys(body).forEach((key) => formData.append(key, body[key]));
+    formData.append("image", urlImg);
+    if (body.receiver) {
       axios({
         method: "post",
         url: `${BASE_URL}/api/chat/inbox`,
@@ -93,6 +156,7 @@ const ModelChat = ({ open, close, idFriend }) => {
             idFriend: idReceiver || idFriend,
             idMe: infoUser?._id,
           };
+
           socket?.emit("inbox_user", data);
         } else {
           dispatch(
@@ -102,7 +166,7 @@ const ModelChat = ({ open, close, idFriend }) => {
             })
           );
         }
-        dispatch(getListMessage(idReceiver || idFriend));
+
         axios({
           method: "get",
           url: `${BASE_URL}/api/chat/get-rooms`,
@@ -115,74 +179,31 @@ const ModelChat = ({ open, close, idFriend }) => {
             setRooms(response?.data?.data);
           }
         });
+        dispatch(getListMessage(idReceiver || idFriend));
         scrollToBottom();
         setInputText("");
         setPreviewImage("");
         setUrlImg("");
       });
+    } else {
+      dispatch(
+        showModalMessage({
+          type: "ERROR",
+          msg: "Bạn chưa chọn người liên hệ!",
+        })
+      );
     }
-  };
-
-  const sendMessage = async () => {
-    const body = {
-      receiver: idReceiver || idFriend,
-      content: inputText.trim(),
-    };
-
-    const formData = new FormData();
-    Object.keys(body).forEach((key) => formData.append(key, body[key]));
-    formData.append("image", urlImg);
-    axios({
-      method: "post",
-      url: `${BASE_URL}/api/chat/inbox`,
-      headers: {
-        "Content-Type": "multipart/form-data",
-        Authorization: "Bearer " + localStorage.getItem("token"),
-      },
-      data: formData,
-    }).then((response) => {
-      if (response?.status === 200) {
-        const data = {
-          idFriend: idReceiver || idFriend,
-          idMe: infoUser?._id,
-        };
-        socket?.emit("inbox_user", data);
-      } else {
-        dispatch(
-          showModalMessage({
-            type: "ERROR",
-            msg: "Đã có lỗi xảy ra, có thể tài khoản của bạn hoặc người gửi đã bị khóa!",
-          })
-        );
-      }
-      dispatch(getListMessage(idReceiver || idFriend));
-      axios({
-        method: "get",
-        url: `${BASE_URL}/api/chat/get-rooms`,
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: "Bearer " + localStorage.getItem("token"),
-        },
-      }).then((response) => {
-        if (response.status === 200) {
-          setRooms(response?.data?.data);
-        }
-      });
-      scrollToBottom();
-      setInputText("");
-      setPreviewImage("");
-      setUrlImg("");
-    });
   };
 
   useEffect(() => {
     socket?.on("get_message", async (data) => {
-      if (infoUser?._id === data.idFriend) {
+      if (infoUser._id === data.idFriend) {
+        await dispatch(getListMessage(idReceiver || data.idMe));
         scrollToBottom();
-        await dispatch(getListMessage(idReceiver || idFriend));
       }
     });
   }, [socket]);
+
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (token !== null) {
@@ -222,53 +243,75 @@ const ModelChat = ({ open, close, idFriend }) => {
               {rooms &&
                 rooms?.length > 0 &&
                 rooms.map((room, index) => (
-                  <div
-                    onClick={() => {
-                      if (room?.users[0].user._id === infoUser._id) {
-                        dispatch(getListMessage(room?.users[1].user._id));
-                        scrollToBottom();
-                        setIdReceiver(room?.users[1].user._id);
-                        dispatch(
-                          updateCountMess({
-                            userId: room?.users[1].user._id,
-                            action: "DELETE",
-                          })
-                        );
-                      } else {
-                        dispatch(getListMessage(room?.users[0].user._id));
-                        scrollToBottom();
-                        setIdReceiver(room?.users[0].user._id);
-                        dispatch(
-                          updateCountMess({
-                            userId: room?.users[0].user._id,
-                            action: "DELETE",
-                          })
-                        );
+                  <>
+                    <div
+                      onClick={() => {
+                        if (room?.users[0].user._id === infoUser._id) {
+                          dispatch(getListMessage(room?.users[1].user._id));
+                          scrollToBottom();
+                          setIdReceiver(room?.users[1].user._id);
+                          dispatch(
+                            updateCountMess({
+                              userId: room?.users[1].user._id,
+                              action: "DELETE",
+                            })
+                          );
+                        } else {
+                          dispatch(getListMessage(room?.users[0].user._id));
+                          scrollToBottom();
+                          setIdReceiver(room?.users[0].user._id);
+                          dispatch(
+                            updateCountMess({
+                              userId: room?.users[0].user._id,
+                              action: "DELETE",
+                            })
+                          );
+                        }
+                        setActive(index);
+                      }}
+                      className={
+                        index === active ? "room_active" : "room_element"
                       }
-                      setActive(index);
-                    }}
-                    className={
-                      index === active ? "room_active" : "room_element"
-                    }
-                  >
-                    <Avatar
-                      src={
-                        room?.users[0].user?._id === infoUser?._id
-                          ? room?.users[1].user?.avatar
-                          : room?.users[0].user?.avatar
-                      }
-                      style={{ width: 40, height: 40 }}
-                    />
-                    <div>
+                    >
+                      <Avatar
+                        src={
+                          room?.users[0].user?._id === infoUser?._id
+                            ? room?.users[1].user?.avatar
+                            : room?.users[0].user?.avatar
+                        }
+                        style={{ width: 40, height: 40 }}
+                      />
                       <div>
-                        <p>
-                          {room?.users[0].user?._id === infoUser?._id
-                            ? room?.users[1].user?.userName
-                            : room?.users[0].user?.userName}
-                        </p>
                         <div>
-                          {room?.users[1].user?._id !== infoUser._id ? (
-                            room?.users[1].user?.active ? (
+                          <p>
+                            {room?.users[0].user?._id === infoUser?._id
+                              ? room?.users[1].user?.userName
+                              : room?.users[0].user?.userName}
+                          </p>
+                          <div>
+                            {room?.users[1].user?._id !== infoUser._id ? (
+                              room?.users[1].user?.active ? (
+                                <ul
+                                  className="active_user text-success"
+                                  style={{ fontSize: "10px" }}
+                                >
+                                  <li>Đang hoạt động</li>
+                                </ul>
+                              ) : (
+                                <div
+                                  style={{
+                                    color: "silver",
+                                    fontSize: "10px",
+                                  }}
+                                >
+                                  Hoạt động{" "}
+                                  {format(
+                                    room?.users[1]?.user?.updatedAt,
+                                    "my-locale"
+                                  )}
+                                </div>
+                              )
+                            ) : room?.users[0].user?.active ? (
                               <ul
                                 className="active_user text-success"
                                 style={{ fontSize: "10px" }}
@@ -284,31 +327,16 @@ const ModelChat = ({ open, close, idFriend }) => {
                               >
                                 Hoạt động{" "}
                                 {format(
-                                  room?.users[1]?.user?.updatedAt,
+                                  room?.users[0].user?.updatedAt,
                                   "my-locale"
                                 )}
                               </div>
-                            )
-                          ) : room?.users[0].user?.active ? (
-                            <ul
-                              className="active_user text-success"
-                              style={{ fontSize: "10px" }}
-                            >
-                              <li>Đang hoạt động</li>
-                            </ul>
-                          ) : (
-                            <div style={{ color: "silver", fontSize: "10px" }}>
-                              Hoạt động{" "}
-                              {format(
-                                room?.users[0].user?.updatedAt,
-                                "my-locale"
-                              )}
-                            </div>
-                          )}
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </>
                 ))}
             </div>
             {/* message */}

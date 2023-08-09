@@ -140,7 +140,7 @@ const NavBar = () => {
 
   useEffect(() => {
     socket?.on("getNoti", async (data) => {
-      if (infoUser?.userName === data?.userNameCreatePost) {
+      if (data) {
         await fetchNotification();
       }
     });

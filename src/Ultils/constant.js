@@ -1,5 +1,5 @@
-export const BASE_URL = "http://localhost:2500";
-// export const BASE_URL = "https://test.xsim.vn";
+// export const BASE_URL = "http://localhost:2500";
+export const BASE_URL = "https://test.xsim.vn";
 export const localeFunc = (number, index, totalSec) => {
   return [
     ["bây giờ", "bây giờ"],
