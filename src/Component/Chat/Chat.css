@@ -144,3 +144,17 @@
 .inputChat{
     height: 5vh;
 }
+.countMessage{
+    border-radius: 40%;
+    margin-bottom: -5px;
+    height: 20px;
+    background-color: red;
+    color: #ffffff;
+    width: 30px;
+    height: 30px;
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    align-items: center;
+    margin-left:197vh;
+}

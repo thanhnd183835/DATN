@@ -199,6 +199,7 @@ const ModelChat = ({ open, close, idFriend }) => {
     socket?.on("get_message", async (data) => {
       if (infoUser._id === data.idFriend) {
         await dispatch(getListMessage(idReceiver || data.idMe));
+        await dispatch(updateCountMess({ userId: data.idMe, action: "PUSH" }));
         scrollToBottom();
       }
     });

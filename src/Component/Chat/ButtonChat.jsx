@@ -4,11 +4,10 @@ import "./Chat.css";
 import MessageIcon from "@mui/icons-material/Message";
 import ModelChat from "./ModelChat";
 import { useSelector, useDispatch } from "react-redux";
-import { getRooms } from "../../Redux/chat/chat.slice";
 
 const ButtonChat = () => {
   const dispatch = useDispatch();
-  const rooms = useSelector((state) => state.chat?.rooms?.data?.data);
+  const countNewMess = useSelector((state) => state.chat?.countNewMess?.length);
 
   const [openChat, setOpenChat] = React.useState(false);
   const [openIcon, setOpenIcon] = React.useState(true);
@@ -21,24 +20,27 @@ const ButtonChat = () => {
     setOpenChat(false);
     setOpenIcon(true);
   };
+  console.log(countNewMess);
   return (
     <>
       <div>
         <ModelChat open={openChat} close={handCloseModelChat} />
       </div>
       {openIcon && (
-        <div>
-          <Fab
-            color="warning"
-            aria-label="add"
-            style={{ position: "fixed", right: 30, width: 100 }}
-            onClick={handleShowBoxChat}
-            variant="extended"
-          >
-            <MessageIcon className="me-2" />
-            Chat
-          </Fab>
-        </div>
+        <>
+          <div>
+            <Fab
+              color="warning"
+              aria-label="add"
+              style={{ position: "fixed", right: 30, width: 100 }}
+              onClick={handleShowBoxChat}
+              variant="extended"
+            >
+              <MessageIcon className="me-2" />
+              Chat
+            </Fab>
+          </div>
+        </>
       )}
     </>
   );

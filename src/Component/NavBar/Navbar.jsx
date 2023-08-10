@@ -479,20 +479,13 @@ const NavBar = () => {
       )}
       <MenuItem onClick={() => navigate("/cart-detail")}>
         <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
+          <Badge badgeContent={showNumberCart()} color="error">
             <LocalGroceryStoreIcon color="primary" />
           </Badge>
         </IconButton>
         <p className="mt-3">Giỏ hàng</p>
       </MenuItem>
-      <MenuItem>
-        <IconButton size="large" aria-label="show 4 new mails" color="inherit">
-          <Badge badgeContent={4} color="error">
-            <MailIcon color="primary" />
-          </Badge>
-        </IconButton>
-        <p className="mt-3">Tin Nhắn</p>
-      </MenuItem>
+
       <MenuItem>
         <IconButton
           size="large"

@@ -36,9 +36,9 @@ export const signInGoogle = createAsyncThunk(
     }
   }
 );
-export const logout = createAsyncThunk("auth/logout", async (access_token) => {
+export const logout = createAsyncThunk("auth/logout", async () => {
   try {
-    return await axiosInstance.post(`api/auth/logout`, access_token);
+    return await axiosInstance.post(`api/auth/logout`);
   } catch (error) {
     throw error;
   }

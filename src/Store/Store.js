@@ -20,6 +20,7 @@ import socketReducer from "../Redux/socket/socket.slice";
 import cartReducer from "../Redux/cart/cart.slice";
 import chatReducer from "../Redux/chat/chat.slice";
 import orderReducer from "../Redux/order/order.slice";
+
 const rootReducer = combineReducers({
   auth: authReducer,
   // transaction: transactionReducer,
@@ -37,6 +38,7 @@ const persistConfig = {
   key: "root",
   version: 1,
   storage: storage,
+
   blacklist: ["age"],
   // blacklist: ['age'], //blacklisting a store attribute name, will not persist that store attribute.
 };
