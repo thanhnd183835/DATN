@@ -104,7 +104,7 @@ const Profile = () => {
             Authorization: "Bearer " + localStorage.getItem("token"),
           },
         }).then((response) => {
-          if (response.status === 200) {
+          if (response?.status === 200) {
             setListPost(response.data.data);
           }
         });
@@ -132,18 +132,19 @@ const Profile = () => {
           Authorization: "Bearer " + localStorage.getItem("token"),
         },
       }).then((response) => {
-        if (response.status === 200) {
+        if (response?.status === 200) {
           setListPost(response.data.data);
         }
       });
     }
   };
   const handleOpenDialog = async () => {
-    const res = dispatch(deletePost(idPost));
-    if (res.payload.status === 200) {
+    const res = await dispatch(deletePost(idPost));
+    console.log(res);
+    if (res.payload?.status === 200) {
       setOpenDialog(false);
+      fetchData();
     }
-    fetchData();
   };
   useEffect(() => {
     fetchData();
@@ -241,7 +242,7 @@ const Profile = () => {
         data: formData,
       })
         .then((response) => {
-          if (response.status === 200) {
+          if (response?.status === 200) {
             setIsChangeAvatar(false);
             dispatch(getMe());
             dispatch(
@@ -253,7 +254,7 @@ const Profile = () => {
           }
         })
         .catch((err) => {
-          if (err.response.status === 500) {
+          if (err?.response?.status === 500) {
             dispatch(
               showModalMessage({
                 type: "ERROR",

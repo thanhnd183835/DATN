@@ -20,7 +20,7 @@ const ButtonChat = () => {
     setOpenChat(false);
     setOpenIcon(true);
   };
-  console.log(countNewMess);
+
   return (
     <>
       <div>
